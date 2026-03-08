@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split PDF — Extract Pages Free | PDFSnip.com</title>
+  <meta name="description" content="Split a PDF into individual pages or custom ranges online. Free, fast, and secure. No watermark, no signup required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--surface:#1c1c28;--border:#2a2a3d;--accent:#44dd88;--text:#f0f0f5;--text2:#9999bb}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text);text-decoration:none}
+    .logo span{color:#ff5533}
+    .nav-right{display:flex;gap:12px;align-items:center}
+    .nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;padding:6px 14px;border-radius:8px;transition:all 0.2s}
+    .nav-link:hover{color:var(--text);background:var(--surface)}
+    .nav-btn{background:#ff5533;color:white;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 18px;border-radius:8px}
+    .page{max-width:860px;margin:0 auto;padding:100px 24px 80px}
+    .breadcrumb{font-size:0.8rem;color:var(--text2);margin-bottom:28px}
+    .breadcrumb a{color:var(--text2);text-decoration:none}
+    .breadcrumb a:hover{color:var(--accent)}
+    h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
+    .subtitle{color:var(--text2);font-size:1rem;margin-bottom:36px}
+    .drop-zone{border:2px dashed var(--border);border-radius:20px;padding:52px 32px;text-align:center;background:var(--bg3);cursor:pointer;transition:border-color 0.2s,background 0.2s}
+    .drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(68,221,136,0.04)}
+    .drop-icon{font-size:2.8rem;display:block;margin-bottom:14px}
+    .drop-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px}
+    .drop-sub{color:var(--text2);font-size:0.85rem;margin-bottom:20px}
+    .browse-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#0a0a0f;border:none;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s}
+    .browse-btn:hover{opacity:0.88;transform:translateY(-1px)}
+    .file-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:16px}
+    .file-row-name{flex:1;font-size:0.88rem;font-weight:500}
+    .file-row-size{font-size:0.76rem;color:var(--text2)}
+    .file-row-rm{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px}
+    .file-row-rm:hover{color:#ff5533}
+    .settings-box{margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .settings-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:16px}
+    .info-banner{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.84rem;color:var(--text2);margin-bottom:16px;display:none}
+    .split-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .tab-btn{padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s}
+    .tab-btn.active{background:var(--accent);color:#0a0a0f;border-color:var(--accent)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .setting label{font-size:0.78rem;color:var(--text2);font-weight:500;display:block;margin-bottom:6px}
+    input[type=text]{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;width:100%;max-width:340px}
+    input[type=text]:focus{outline:none;border-color:var(--accent)}
+    .hint{font-size:0.76rem;color:var(--text2);margin-top:6px}
+    .convert-wrap{margin-top:20px;text-align:center}
+    .convert-btn{background:var(--accent);color:#0a0a0f;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;padding:15px 44px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:10px}
+    .convert-btn:hover:not(:disabled){opacity:0.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(68,221,136,0.3)}
+    .convert-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+    .log-box{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+    .log-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.87rem}
+    .spinner{width:18px;height:18px;flex-shrink:0;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .results-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;margin-top:32px}
+    .results-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
+    .results-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .zip-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px}
+    .zip-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .zip-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .reset-btn{background:var(--accent);color:#0a0a0f;border:none;padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+    .reset-btn:hover{opacity:0.85}
+    .pdf-list{display:flex;flex-direction:column;gap:10px}
+    .pdf-card{display:flex;align-items:center;gap:14px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
+    .pdf-card-icon{font-size:2rem;flex-shrink:0}
+    .pdf-card-info{flex:1}
+    .pdf-card-name{font-weight:600;font-size:0.9rem;margin-bottom:2px}
+    .pdf-card-meta{font-size:0.78rem;color:var(--text2)}
+    .dl-btn{background:var(--accent);color:#0a0a0f;border:none;padding:9px 20px;border-radius:9px;font-size:0.84rem;font-weight:700;cursor:pointer;transition:opacity 0.2s;white-space:nowrap;flex-shrink:0}
+    .dl-btn:hover{opacity:0.85}
+    .faq-section{background:var(--bg2);border-top:1px solid var(--border);padding:72px 24px;margin-top:60px}
+    .faq-inner{max-width:720px;margin:0 auto}
+    .section-tag{font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:12px}
+    .section-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:36px}
+    .faq-list{display:flex;flex-direction:column;gap:10px}
+    .faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .faq-q{padding:18px 22px;font-weight:600;font-size:0.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;user-select:none}
+    .faq-q:hover{color:var(--accent)}
+    .faq-icon{transition:transform 0.3s;color:var(--text2);flex-shrink:0}
+    .faq-item.open .faq-icon{transform:rotate(45deg);color:var(--accent)}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s;color:var(--text2);font-size:0.88rem;line-height:1.7}
+    .faq-item.open .faq-a{max-height:300px;padding:0 22px 18px}
+    footer{background:var(--bg);border-top:1px solid var(--border);padding:48px 24px 28px}
+    .footer-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:36px}
+    .footer-logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+    .footer-logo span{color:#ff5533}
+    .footer-desc{font-size:0.84rem;color:var(--text2);margin-top:8px;max-width:240px;line-height:1.6}
+    .footer-col h4{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px}
+    .footer-links{list-style:none;display:flex;flex-direction:column;gap:9px}
+    .footer-links a{color:var(--text2);text-decoration:none;font-size:0.84rem}
+    .footer-links a:hover{color:#ff5533}
+    .footer-bottom{max-width:860px;margin:0 auto;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);flex-wrap:wrap;gap:8px}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:9px;font-size:0.88rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all 0.3s;transform:translateY(80px);opacity:0;pointer-events:none}
+    #toast.show{transform:translateY(0);opacity:1}
+    @media(max-width:600px){nav{padding:0 16px}.page{padding:88px 16px 60px}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">PDF<span>Snip</span></a>
+  <div class="nav-right">
+    <a href="index.html#tools" class="nav-link">All Tools</a>
+    <a href="index.html" class="nav-btn">← Home</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › Split PDF</div>
+  <h1>Split PDF</h1>
+  <p class="subtitle">Extract pages or split a PDF into separate files — right in your browser. No server, no upload, no watermark.</p>
+
+  <div class="drop-zone" id="dz">
+    <span class="drop-icon">✂️</span>
+    <div class="drop-title">Drop your PDF here</div>
+    <div class="drop-sub">or click below · Processed 100% locally in your browser</div>
+    <button class="browse-btn" type="button" id="browseBtn">📂 Choose PDF File</button>
+    <input type="file" id="fileIn" accept=".pdf,application/pdf" style="display:none" />
+    <div id="fileRow"></div>
+  </div>
+
+  <div class="settings-box">
+    <div class="settings-title">⚙️ Split Settings</div>
+    <div class="info-banner" id="infoBanner"></div>
+    <div class="split-tabs">
+      <button class="tab-btn active" onclick="switchTab('all')">📄 Every Page</button>
+      <button class="tab-btn" onclick="switchTab('range')">🎯 Page Ranges</button>
+      <button class="tab-btn" onclick="switchTab('extract')">📌 Extract Pages</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-all">
+      <p style="font-size:0.88rem;color:var(--text2)">Each page of the PDF will be saved as a separate PDF file. Download individually or as a ZIP.</p>
+    </div>
+
+    <div class="tab-panel" id="tab-range">
+      <div class="setting">
+        <label>Page ranges (comma-separated, e.g. <strong>1-3, 4-6, 7</strong>)</label>
+        <input type="text" id="rangeInput" placeholder="e.g. 1-3, 4-6, 7-9" />
+        <div class="hint">Each range becomes a separate PDF. Use a single number for one page.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-extract">
+      <div class="setting">
+        <label>Pages to extract (comma-separated, e.g. <strong>1, 3, 5</strong>)</label>
+        <input type="text" id="extractInput" placeholder="e.g. 1, 3, 5" />
+        <div class="hint">These pages will be combined into one single output PDF.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="convert-wrap">
+    <button class="convert-btn" id="convertBtn" disabled onclick="runSplit()">✂️ Split PDF</button>
+  </div>
+  <div class="log-box" id="logBox"></div>
+  <div id="resultsWrap" style="display:none">
+    <div class="results-header">
+      <div class="results-title">✅ Split Files Ready</div>
+      <div class="results-actions">
+        <button class="zip-btn" id="zipBtn" onclick="doZip()">📦 Download All as ZIP</button>
+        <button class="reset-btn" onclick="doReset()">🔄 Split More</button>
+      </div>
+    </div>
+    <div class="pdf-list" id="pdfList"></div>
+  </div>
+</div>
+
+<div class="faq-section">
+  <div class="faq-inner">
+    <span class="section-tag">FAQ</span>
+    <h2 class="section-title">Common Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Is my PDF uploaded to a server? <span class="faq-icon">+</span></div>
+        <div class="faq-a">No. All splitting is done using pdf-lib, a JavaScript library running entirely in your browser. Your file never leaves your device.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the difference between the split modes? <span class="faq-icon">+</span></div>
+        <div class="faq-a">"Every Page" creates one PDF per page. "Page Ranges" lets you group pages into custom chunks (e.g. 1-3, 4-6). "Extract Pages" pulls specific pages into one single output PDF.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will fonts and images be preserved? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. pdf-lib copies pages exactly as-is, preserving all fonts, images, and formatting from the original PDF.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How do I split a large PDF quickly? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Use "Every Page" to split automatically, then download all at once as a ZIP file. This is the fastest way to break up a multi-page document.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div><div class="footer-logo">PDF<span>Snip</span></div><div class="footer-desc">Free, fast, private PDF & image tools. No watermarks, no limits.</div></div>
+    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links"><li><a href="pdf-to-jpg.html">PDF to JPG</a></li><li><a href="compress-pdf.html">Compress PDF</a></li><li><a href="merge-pdf.html">Merge PDF</a></li><li><a href="split-pdf.html">Split PDF</a></li></ul></div>
+    <div class="footer-col"><h4>Image Tools</h4><ul class="footer-links"><li><a href="compress-jpg.html">Compress JPG</a></li><li><a href="compress-png.html">Compress PNG</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 PDFSnip.com</span><span>Made with ❤️</span></div>
+</footer>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+let currentFile = null;
+let totalPages = 0;
+let splitResults = []; // {name, blob, url}
+let activeTab = 'all';
+
+const dz = document.getElementById('dz');
+const fileIn = document.getElementById('fileIn');
+const browseBtn = document.getElementById('browseBtn');
+
+browseBtn.addEventListener('click', () => fileIn.click());
+fileIn.addEventListener('change', () => { loadFile(fileIn.files[0]); fileIn.value = ''; });
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+async function loadFile(f) {
+  if (!f || !(f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'))) { toast('⚠️', 'Please select a PDF file'); return; }
+  currentFile = f;
+  try {
+    const buf = await f.arrayBuffer();
+    const pdf = await PDFLib.PDFDocument.load(buf);
+    totalPages = pdf.getPageCount();
+    renderFileRow();
+    document.getElementById('infoBanner').style.display = 'block';
+    document.getElementById('infoBanner').innerHTML = `📄 <strong>${f.name}</strong> — <strong>${totalPages}</strong> page${totalPages>1?'s':''} detected`;
+    document.getElementById('convertBtn').disabled = false;
+  } catch(e) {
+    toast('❌', 'Could not read PDF: ' + e.message);
+  }
+}
+
+function renderFileRow() {
+  document.getElementById('fileRow').innerHTML = `
+    <div class="file-row" style="margin-top:16px">
+      <span>📄</span>
+      <span class="file-row-name">${currentFile.name}</span>
+      <span class="file-row-size">${fmt(currentFile.size)}</span>
+      <button class="file-row-rm" onclick="removeFile()">✕</button>
+    </div>`;
+}
+
+function removeFile() {
+  currentFile = null; totalPages = 0;
+  document.getElementById('fileRow').innerHTML = '';
+  document.getElementById('infoBanner').style.display = 'none';
+  document.getElementById('convertBtn').disabled = true;
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['all','range','extract'][i]===tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function parseRanges(str, max) {
+  const parts = str.split(',').map(s => s.trim()).filter(Boolean);
+  return parts.map(p => {
+    const m = p.match(/^(\d+)(?:-(\d+))?$/);
+    if (!m) throw new Error(`Invalid range: "${p}"`);
+    const a = parseInt(m[1]), b = m[2] ? parseInt(m[2]) : a;
+    if (a<1||b>max||a>b) throw new Error(`Range ${p} out of bounds (1–${max})`);
+    return { label: p, pages: Array.from({length:b-a+1},(_,i)=>a+i) };
+  });
+}
+
+function parseExtract(str, max) {
+  const nums = str.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n));
+  if (!nums.length) throw new Error('No valid page numbers entered');
+  nums.forEach(n => { if(n<1||n>max) throw new Error(`Page ${n} out of range (1–${max})`); });
+  return [...new Set(nums)].sort((a,b)=>a-b);
+}
+
+async function runSplit() {
+  if (!currentFile) return;
+  const btn = document.getElementById('convertBtn');
+  btn.disabled = true; btn.textContent = '⚙️ Splitting…';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('pdfList').innerHTML = '';
+  splitResults.forEach(r => URL.revokeObjectURL(r.url));
+  splitResults = [];
+
+  const row = addLogRow('Loading PDF…');
+  try {
+    const { PDFDocument } = PDFLib;
+    const buf = await currentFile.arrayBuffer();
+    const srcPdf = await PDFDocument.load(buf);
+    const baseName = currentFile.name.replace(/\.pdf$/i, '');
+
+    if (activeTab === 'all') {
+      setRowText(row, `Splitting into ${totalPages} pages…`);
+      for (let i = 0; i < totalPages; i++) {
+        const doc = await PDFDocument.create();
+        const [page] = await doc.copyPages(srcPdf, [i]);
+        doc.addPage(page);
+        const bytes = await doc.save();
+        const blob = new Blob([bytes], {type:'application/pdf'});
+        const url = URL.createObjectURL(blob);
+        const name = `${baseName}_page${String(i+1).padStart(3,'0')}.pdf`;
+        splitResults.push({name, blob, url});
+        addPdfCard(name, url, blob.size, `Page ${i+1}`);
+        setRowText(row, `Splitting… page ${i+1}/${totalPages}`);
+      }
+      markRowDone(row, `Split into <strong>${totalPages}</strong> individual pages ✅`);
+
+    } else if (activeTab === 'range') {
+      const raw = document.getElementById('rangeInput').value.trim();
+      if (!raw) { markRowError(row, 'Please enter page ranges'); btn.disabled=false; btn.textContent='✂️ Split PDF'; return; }
+      const ranges = parseRanges(raw, totalPages);
+      setRowText(row, `Creating ${ranges.length} PDF${ranges.length>1?'s':''}…`);
+      for (let ri = 0; ri < ranges.length; ri++) {
+        const {label, pages} = ranges[ri];
+        const doc = await PDFDocument.create();
+        const copied = await doc.copyPages(srcPdf, pages.map(p=>p-1));
+        copied.forEach(p => doc.addPage(p));
+        const bytes = await doc.save();
+        const blob = new Blob([bytes], {type:'application/pdf'});
+        const url = URL.createObjectURL(blob);
+        const name = `${baseName}_pages${label.replace(/\s/g,'')}.pdf`;
+        splitResults.push({name, blob, url});
+        addPdfCard(name, url, blob.size, `Pages ${label}`);
+      }
+      markRowDone(row, `Created <strong>${ranges.length}</strong> PDF file${ranges.length>1?'s':''} ✅`);
+
+    } else if (activeTab === 'extract') {
+      const raw = document.getElementById('extractInput').value.trim();
+      if (!raw) { markRowError(row, 'Please enter page numbers to extract'); btn.disabled=false; btn.textContent='✂️ Split PDF'; return; }
+      const pages = parseExtract(raw, totalPages);
+      setRowText(row, `Extracting ${pages.length} page${pages.length>1?'s':''}…`);
+      const doc = await PDFDocument.create();
+      const copied = await doc.copyPages(srcPdf, pages.map(p=>p-1));
+      copied.forEach(p => doc.addPage(p));
+      const bytes = await doc.save();
+      const blob = new Blob([bytes], {type:'application/pdf'});
+      const url = URL.createObjectURL(blob);
+      const name = `${baseName}_extracted.pdf`;
+      splitResults.push({name, blob, url});
+      addPdfCard(name, url, blob.size, `${pages.length} page${pages.length>1?'s':''} extracted`);
+      markRowDone(row, `Extracted pages <strong>${pages.join(', ')}</strong> into one PDF ✅`);
+    }
+
+    document.getElementById('resultsWrap').style.display = 'block';
+    document.getElementById('zipBtn').style.display = splitResults.length > 1 ? 'inline-flex' : 'none';
+    document.getElementById('resultsWrap').scrollIntoView({behavior:'smooth',block:'start'});
+    toast('✅', `${splitResults.length} file${splitResults.length>1?'s':''} ready!`);
+  } catch(e) {
+    markRowError(row, 'Split failed: ' + e.message);
+    console.error(e);
+  }
+  btn.textContent = '✂️ Split PDF'; btn.disabled = false;
+}
+
+function addPdfCard(name, url, size, meta) {
+  const list = document.getElementById('pdfList');
+  const card = document.createElement('div');
+  card.className = 'pdf-card';
+  card.innerHTML = `
+    <span class="pdf-card-icon">📄</span>
+    <div class="pdf-card-info">
+      <div class="pdf-card-name">${name}</div>
+      <div class="pdf-card-meta">${meta} · ${fmt(size)}</div>
+    </div>
+    <button class="dl-btn" onclick="triggerDownload('${url}','${name}')">⬇️ Download</button>`;
+  list.appendChild(card);
+}
+
+async function doZip() {
+  if (!splitResults.length) return;
+  const btn = document.getElementById('zipBtn');
+  btn.disabled = true; btn.textContent = '⏳ Building ZIP…';
+  try {
+    const zip = new JSZip();
+    for (const {name, blob} of splitResults) zip.file(name, blob);
+    const zipBlob = await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+    triggerDownload(URL.createObjectURL(zipBlob), 'PDFSnip_split.zip');
+    toast('📦', 'ZIP downloaded!');
+  } catch(e) { toast('❌', 'ZIP error: '+e.message); }
+  btn.disabled = false; btn.textContent = '📦 Download All as ZIP';
+}
+
+function doReset() {
+  splitResults.forEach(r => URL.revokeObjectURL(r.url));
+  splitResults = []; currentFile = null; totalPages = 0;
+  document.getElementById('fileRow').innerHTML = '';
+  document.getElementById('infoBanner').style.display = 'none';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('pdfList').innerHTML = '';
+  document.getElementById('convertBtn').disabled = true;
+  document.getElementById('rangeInput').value = '';
+  document.getElementById('extractInput').value = '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function triggerDownload(url, filename) {
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.style.display='none';
+  document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
+}
+function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+function addLogRow(text){const box=document.getElementById('logBox');const row=document.createElement('div');row.className='log-row';row.innerHTML=`<div class="spinner"></div><span>${text}</span>`;box.appendChild(row);return row;}
+function setRowText(row,html){row.querySelector('span').innerHTML=html;}
+function markRowDone(row,html){row.querySelector('.spinner').outerHTML='<span>✅</span>';setRowText(row,html);}
+function markRowError(row,html){row.querySelector('.spinner').outerHTML='<span>❌</span>';setRowText(row,`<span style="color:#ff8866">${html}</span>`);}
+function toast(icon,msg){const t=document.getElementById('toast');t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+document.querySelectorAll('.faq-q').forEach(q=>{q.addEventListener('click',()=>{const item=q.closest('.faq-item');const open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(el=>el.classList.remove('open'));if(!open)item.classList.add('open');});});
+</script>
+</body>
+</html>

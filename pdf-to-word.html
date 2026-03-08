@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF to Word — Convert PDF to DOCX Free | PDFSnip.com</title>
+  <meta name="description" content="Convert PDF files to editable Word DOCX documents online. Free, secure, no watermark, no signup required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--surface:#1c1c28;--border:#2a2a3d;--accent:#ff8844;--text:#f0f0f5;--text2:#9999bb}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text);text-decoration:none}
+    .logo span{color:#ff5533}
+    .nav-right{display:flex;gap:12px;align-items:center}
+    .nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;padding:6px 14px;border-radius:8px;transition:all 0.2s}
+    .nav-link:hover{color:var(--text);background:var(--surface)}
+    .nav-btn{background:#ff5533;color:white;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 18px;border-radius:8px}
+    .page{max-width:860px;margin:0 auto;padding:100px 24px 80px}
+    .breadcrumb{font-size:0.8rem;color:var(--text2);margin-bottom:28px}
+    .breadcrumb a{color:var(--text2);text-decoration:none}
+    .breadcrumb a:hover{color:var(--accent)}
+    h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
+    .subtitle{color:var(--text2);font-size:1rem;margin-bottom:36px}
+    .info-card{display:flex;align-items:flex-start;gap:14px;background:rgba(255,136,68,0.08);border:1px solid rgba(255,136,68,0.3);border-radius:14px;padding:16px 20px;margin-bottom:28px}
+    .info-card-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+    .info-card-text{font-size:0.86rem;color:var(--text2);line-height:1.6}
+    .info-card-text strong{color:var(--text)}
+    .drop-zone{border:2px dashed var(--border);border-radius:20px;padding:52px 32px;text-align:center;background:var(--bg3);cursor:pointer;transition:border-color 0.2s,background 0.2s}
+    .drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(255,136,68,0.04)}
+    .drop-icon{font-size:2.8rem;display:block;margin-bottom:14px}
+    .drop-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px}
+    .drop-sub{color:var(--text2);font-size:0.85rem;margin-bottom:20px}
+    .browse-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s}
+    .browse-btn:hover{opacity:0.88;transform:translateY(-1px)}
+    .file-list{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+    .file-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+    .file-row-name{flex:1;font-size:0.88rem;font-weight:500}
+    .file-row-size{font-size:0.76rem;color:var(--text2)}
+    .file-row-rm{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px}
+    .file-row-rm:hover{color:#ff5533}
+    .settings-box{margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .settings-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:18px}
+    .settings-row{display:flex;gap:16px;flex-wrap:wrap}
+    .setting{display:flex;flex-direction:column;gap:7px;flex:1;min-width:160px}
+    .setting label{font-size:0.78rem;color:var(--text2);font-weight:500}
+    select{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;appearance:none;width:100%}
+    select:focus{outline:none;border-color:var(--accent)}
+    .convert-wrap{margin-top:20px;text-align:center}
+    .convert-btn{background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;padding:15px 44px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:10px}
+    .convert-btn:hover:not(:disabled){opacity:0.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,136,68,0.35)}
+    .convert-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+    .log-box{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+    .log-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.87rem}
+    .spinner{width:18px;height:18px;flex-shrink:0;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .results-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;margin-top:32px}
+    .results-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
+    .results-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .reset-btn{background:var(--accent);color:white;border:none;padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+    .reset-btn:hover{opacity:0.85}
+    .docx-list{display:flex;flex-direction:column;gap:10px}
+    .docx-card{display:flex;align-items:center;gap:14px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
+    .docx-icon{font-size:2.2rem;flex-shrink:0}
+    .docx-info{flex:1}
+    .docx-name{font-weight:600;font-size:0.9rem;margin-bottom:2px}
+    .docx-meta{font-size:0.78rem;color:var(--text2)}
+    .dl-btn{background:var(--accent);color:white;border:none;padding:9px 20px;border-radius:9px;font-size:0.84rem;font-weight:700;cursor:pointer;transition:opacity 0.2s;white-space:nowrap;flex-shrink:0}
+    .dl-btn:hover{opacity:0.85}
+    .faq-section{background:var(--bg2);border-top:1px solid var(--border);padding:72px 24px;margin-top:60px}
+    .faq-inner{max-width:720px;margin:0 auto}
+    .section-tag{font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:12px}
+    .section-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:36px}
+    .faq-list{display:flex;flex-direction:column;gap:10px}
+    .faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .faq-q{padding:18px 22px;font-weight:600;font-size:0.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;user-select:none}
+    .faq-q:hover{color:var(--accent)}
+    .faq-icon{transition:transform 0.3s;color:var(--text2);flex-shrink:0}
+    .faq-item.open .faq-icon{transform:rotate(45deg);color:var(--accent)}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s;color:var(--text2);font-size:0.88rem;line-height:1.7}
+    .faq-item.open .faq-a{max-height:400px;padding:0 22px 18px}
+    footer{background:var(--bg);border-top:1px solid var(--border);padding:48px 24px 28px}
+    .footer-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:36px}
+    .footer-logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+    .footer-logo span{color:#ff5533}
+    .footer-desc{font-size:0.84rem;color:var(--text2);margin-top:8px;max-width:240px;line-height:1.6}
+    .footer-col h4{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px}
+    .footer-links{list-style:none;display:flex;flex-direction:column;gap:9px}
+    .footer-links a{color:var(--text2);text-decoration:none;font-size:0.84rem}
+    .footer-links a:hover{color:#ff5533}
+    .footer-bottom{max-width:860px;margin:0 auto;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);flex-wrap:wrap;gap:8px}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:9px;font-size:0.88rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all 0.3s;transform:translateY(80px);opacity:0;pointer-events:none}
+    #toast.show{transform:translateY(0);opacity:1}
+    canvas{display:none}
+    @media(max-width:600px){nav{padding:0 16px}.page{padding:88px 16px 60px}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">PDF<span>Snip</span></a>
+  <div class="nav-right">
+    <a href="index.html#tools" class="nav-link">All Tools</a>
+    <a href="index.html" class="nav-btn">← Home</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › PDF to Word</div>
+  <h1>PDF to Word Converter</h1>
+  <p class="subtitle">Convert your PDF to an editable DOCX file — fully in your browser. No upload, no server, no watermark.</p>
+
+  <div class="info-card">
+    <span class="info-card-icon">ℹ️</span>
+    <div class="info-card-text">
+      <strong>About browser-based PDF to Word conversion:</strong> This tool extracts all text content from your PDF and formats it into a clean, editable Word document. Complex layouts (multi-column, tables, text inside images) are linearized into a readable document. For pixel-perfect layout preservation, a server-side tool like Adobe Acrobat is recommended. All processing happens <strong>100% locally</strong> in your browser — your file is never uploaded.
+    </div>
+  </div>
+
+  <div class="drop-zone" id="dz">
+    <span class="drop-icon">📝</span>
+    <div class="drop-title">Drop your PDF here</div>
+    <div class="drop-sub">or click below · Text is extracted and saved as DOCX · 100% local</div>
+    <button class="browse-btn" type="button" id="browseBtn">📂 Choose PDF File</button>
+    <input type="file" id="fileIn" accept=".pdf,application/pdf" multiple style="display:none" />
+    <div class="file-list" id="fileList"></div>
+  </div>
+
+  <div class="settings-box">
+    <div class="settings-title">⚙️ Settings</div>
+    <div class="settings-row">
+      <div class="setting">
+        <label>Heading Detection</label>
+        <select id="headingMode">
+          <option value="auto" selected>Auto-detect headings</option>
+          <option value="none">Plain text (no headings)</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label>Page Breaks</label>
+        <select id="pageBreakMode">
+          <option value="yes" selected>Insert page breaks</option>
+          <option value="no">Continuous (no breaks)</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label>Pages</label>
+        <select id="pgMode">
+          <option value="all" selected>All Pages</option>
+          <option value="first">First Page Only</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="convert-wrap">
+    <button class="convert-btn" id="convertBtn" disabled onclick="runConvert()">📝 Convert to Word</button>
+  </div>
+  <div class="log-box" id="logBox"></div>
+  <div id="resultsWrap" style="display:none">
+    <div class="results-header">
+      <div class="results-title">✅ Word Documents Ready</div>
+      <div class="results-actions">
+        <button class="reset-btn" onclick="doReset()">🔄 Convert More</button>
+      </div>
+    </div>
+    <div class="docx-list" id="docxList"></div>
+  </div>
+</div>
+
+<canvas id="cv"></canvas>
+
+<div class="faq-section">
+  <div class="faq-inner">
+    <span class="section-tag">FAQ</span>
+    <h2 class="section-title">Common Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">How accurate is the conversion? <span class="faq-icon">+</span></div>
+        <div class="faq-a">For text-heavy PDFs (reports, articles, contracts), accuracy is very high — all text is extracted faithfully. Complex layouts like multi-column pages, forms, or text within images may not convert perfectly since the tool linearizes content into a standard Word paragraph flow.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my PDF uploaded to a server? <span class="faq-icon">+</span></div>
+        <div class="faq-a">No. Everything runs locally in your browser using PDF.js to extract text. Your file never leaves your device.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why can't I convert scanned PDFs? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Scanned PDFs contain images of text, not actual text characters. This tool extracts digital text from PDFs. Scanned documents require OCR (Optical Character Recognition) which is computationally intensive and not supported in this browser-based tool.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the output format? <span class="faq-icon">+</span></div>
+        <div class="faq-a">The output is a .docx file, compatible with Microsoft Word, Google Docs, LibreOffice, and all modern document editors. The file uses standard Open XML format.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div><div class="footer-logo">PDF<span>Snip</span></div><div class="footer-desc">Free, fast, private PDF & image tools. No watermarks, no limits.</div></div>
+    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links"><li><a href="pdf-to-jpg.html">PDF to JPG</a></li><li><a href="pdf-to-png.html">PDF to PNG</a></li><li><a href="pdf-to-word.html">PDF to Word</a></li><li><a href="compress-pdf.html">Compress PDF</a></li></ul></div>
+    <div class="footer-col"><h4>Image Tools</h4><ul class="footer-links"><li><a href="compress-jpg.html">Compress JPG</a></li><li><a href="compress-png.html">Compress PNG</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 PDFSnip.com</span><span>Made with ❤️</span></div>
+</footer>
+<div id="toast"></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let files = [];
+let results = []; // {name, blob, url}
+
+const dz = document.getElementById('dz');
+const fileIn = document.getElementById('fileIn');
+const browseBtn = document.getElementById('browseBtn');
+
+browseBtn.addEventListener('click', () => fileIn.click());
+fileIn.addEventListener('change', () => { addFiles([...fileIn.files]); fileIn.value = ''; });
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); addFiles([...e.dataTransfer.files]); });
+
+function addFiles(incoming) {
+  const pdfs = incoming.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+  if (!pdfs.length) { toast('⚠️', 'Please select PDF files only'); return; }
+  files = [...files, ...pdfs]; renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList'); list.innerHTML = '';
+  files.forEach((f, i) => {
+    const d = document.createElement('div'); d.className = 'file-row';
+    d.innerHTML = `<span>📄</span><span class="file-row-name">${f.name}</span><span class="file-row-size">${fmt(f.size)}</span><button class="file-row-rm" onclick="removeFile(${i})">✕</button>`;
+    list.appendChild(d);
+  });
+  document.getElementById('convertBtn').disabled = files.length === 0;
+}
+
+function removeFile(i) { files.splice(i, 1); renderFileList(); }
+function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+
+// ── DOCX builder (pure XML, no external library needed) ───────────
+function escXml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+
+function buildDocx(pages, insertPageBreaks, detectHeadings) {
+  // Build paragraph XML for each text item
+  let bodyXml = '';
+  const headingPattern = /^[A-Z][A-Z0-9 :,\-]{3,}$/; // all-caps lines as headings
+
+  pages.forEach((pageItems, pageIdx) => {
+    // group by lines
+    const lines = [];
+    let lastY = null;
+    let currentLine = [];
+    const sorted = [...pageItems].sort((a,b)=> (b.transform[5]-a.transform[5]) || (a.transform[4]-b.transform[4]));
+
+    sorted.forEach(item => {
+      const y = Math.round(item.transform[5]);
+      if (lastY === null || Math.abs(y - lastY) < 5) {
+        currentLine.push(item);
+        lastY = y;
+      } else {
+        if (currentLine.length) lines.push(currentLine);
+        currentLine = [item]; lastY = y;
+      }
+    });
+    if (currentLine.length) lines.push(currentLine);
+
+    lines.forEach(line => {
+      const text = line.map(i => i.str).join(' ').trim();
+      if (!text) return;
+
+      let style = 'Normal';
+      if (detectHeadings && headingPattern.test(text) && text.length < 80) style = 'Heading1';
+
+      const escapedText = escXml(text);
+      if (style === 'Heading1') {
+        bodyXml += `<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t xml:space="preserve">${escapedText}</w:t></w:r></w:p>`;
+      } else {
+        bodyXml += `<w:p><w:r><w:t xml:space="preserve">${escapedText}</w:t></w:r></w:p>`;
+      }
+    });
+
+    if (insertPageBreaks && pageIdx < pages.length - 1) {
+      bodyXml += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+    }
+  });
+
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<w:body>
+${bodyXml}
+<w:sectPr>
+  <w:pgSz w:w="12240" w:h="15840"/>
+  <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/>
+</w:sectPr>
+</w:body>
+</w:document>`;
+
+  const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+
+  const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:style w:type="paragraph" w:styleId="Normal">
+    <w:name w:val="Normal"/>
+    <w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading1">
+    <w:name w:val="heading 1"/>
+    <w:basedOn w:val="Normal"/>
+    <w:pPr><w:keepNext/><w:spacing w:before="240" w:after="120"/></w:pPr>
+    <w:rPr><w:b/><w:sz w:val="36"/><w:szCs w:val="36"/></w:rPr>
+  </w:style>
+</w:styles>`;
+
+  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`;
+
+  const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+  return { documentXml, relsXml, stylesXml, contentTypesXml, rootRelsXml };
+}
+
+async function buildZipBlob(xmlParts) {
+  // Build DOCX as a ZIP using native browser APIs
+  // We'll create a minimal ZIP file manually since JSZip isn't loaded here.
+  // Instead, use the Blob trick with a known DOCX structure.
+  // We encode each file part as a stored (uncompressed) entry in the ZIP.
+
+  function strToUint8(str) {
+    return new TextEncoder().encode(str);
+  }
+
+  function uint32LE(n) {
+    const b = new Uint8Array(4);
+    b[0]=n&0xff;b[1]=(n>>8)&0xff;b[2]=(n>>16)&0xff;b[3]=(n>>24)&0xff;
+    return b;
+  }
+  function uint16LE(n) {
+    const b = new Uint8Array(2);
+    b[0]=n&0xff;b[1]=(n>>8)&0xff;
+    return b;
+  }
+
+  function crc32(data) {
+    const table = new Uint32Array(256);
+    for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=c&1?(0xEDB88320^(c>>>1)):(c>>>1);table[i]=c;}
+    let crc=0xFFFFFFFF;
+    for(let i=0;i<data.length;i++)crc=table[(crc^data[i])&0xff]^(crc>>>8);
+    return (crc^0xFFFFFFFF)>>>0;
+  }
+
+  const entries = [
+    { name: '[Content_Types].xml', data: strToUint8(xmlParts.contentTypesXml) },
+    { name: '_rels/.rels', data: strToUint8(xmlParts.rootRelsXml) },
+    { name: 'word/document.xml', data: strToUint8(xmlParts.documentXml) },
+    { name: 'word/_rels/document.xml.rels', data: strToUint8(xmlParts.relsXml) },
+    { name: 'word/styles.xml', data: strToUint8(xmlParts.stylesXml) },
+  ];
+
+  const localHeaders = [];
+  const centralDirs = [];
+  let offset = 0;
+
+  for (const entry of entries) {
+    const nameBytes = strToUint8(entry.name);
+    const crc = crc32(entry.data);
+    const size = entry.data.length;
+
+    // Local file header
+    const lh = new Uint8Array([
+      0x50,0x4b,0x03,0x04, // signature
+      20,0,                // version needed
+      0,0,                 // flags
+      0,0,                 // compression (stored)
+      0,0,0,0,             // mod time/date
+      ...uint32LE(crc),
+      ...uint32LE(size),
+      ...uint32LE(size),
+      ...uint16LE(nameBytes.length),
+      0,0,                 // extra field length
+    ]);
+
+    const localEntry = new Uint8Array(lh.length + nameBytes.length + size);
+    localEntry.set(lh, 0);
+    localEntry.set(nameBytes, lh.length);
+    localEntry.set(entry.data, lh.length + nameBytes.length);
+
+    // Central directory entry
+    const cd = new Uint8Array([
+      0x50,0x4b,0x01,0x02, // signature
+      20,0,                // version made by
+      20,0,                // version needed
+      0,0,                 // flags
+      0,0,                 // compression
+      0,0,0,0,             // mod time/date
+      ...uint32LE(crc),
+      ...uint32LE(size),
+      ...uint32LE(size),
+      ...uint16LE(nameBytes.length),
+      0,0,                 // extra length
+      0,0,                 // comment length
+      0,0,                 // disk number start
+      0,0,                 // internal attrs
+      0,0,0,0,             // external attrs
+      ...uint32LE(offset),
+    ]);
+
+    const cdEntry = new Uint8Array(cd.length + nameBytes.length);
+    cdEntry.set(cd, 0);
+    cdEntry.set(nameBytes, cd.length);
+
+    localHeaders.push(localEntry);
+    centralDirs.push(cdEntry);
+    offset += localEntry.length;
+  }
+
+  const cdOffset = offset;
+  const cdSize = centralDirs.reduce((s,e)=>s+e.length, 0);
+  const numEntries = entries.length;
+
+  const eocd = new Uint8Array([
+    0x50,0x4b,0x05,0x06,
+    0,0,0,0,
+    ...uint16LE(numEntries),
+    ...uint16LE(numEntries),
+    ...uint32LE(cdSize),
+    ...uint32LE(cdOffset),
+    0,0,
+  ]);
+
+  const totalSize = offset + cdSize + eocd.length;
+  const zip = new Uint8Array(totalSize);
+  let pos = 0;
+  localHeaders.forEach(e => { zip.set(e, pos); pos += e.length; });
+  centralDirs.forEach(e => { zip.set(e, pos); pos += e.length; });
+  zip.set(eocd, pos);
+
+  return new Blob([zip], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+async function runConvert() {
+  if (!files.length) return;
+  const btn = document.getElementById('convertBtn');
+  const logBox = document.getElementById('logBox');
+  const wrap = document.getElementById('resultsWrap');
+
+  btn.disabled = true; btn.textContent = '⚙️ Converting…';
+  logBox.innerHTML = ''; wrap.style.display = 'none';
+  document.getElementById('docxList').innerHTML = '';
+  results.forEach(r => URL.revokeObjectURL(r.url)); results = [];
+
+  const headingMode = document.getElementById('headingMode').value;
+  const pageBreakMode = document.getElementById('pageBreakMode').value;
+  const pgMode = document.getElementById('pgMode').value;
+  const detectHeadings = headingMode === 'auto';
+  const insertPageBreaks = pageBreakMode === 'yes';
+
+  for (const file of files) {
+    const baseName = file.name.replace(/\.pdf$/i, '');
+    const row = addLogRow(`Loading ${file.name}…`);
+    try {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+      const totalPg = pgMode === 'first' ? 1 : pdf.numPages;
+
+      setRowText(row, `Extracting text from <strong>${file.name}</strong> — ${totalPg} page${totalPg>1?'s':''}…`);
+
+      const allPages = [];
+      for (let p = 1; p <= totalPg; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        allPages.push(content.items);
+        setRowText(row, `Extracting page ${p}/${totalPg}…`);
+      }
+
+      setRowText(row, 'Building Word document…');
+      const xmlParts = buildDocx(allPages, insertPageBreaks, detectHeadings);
+      const blob = await buildZipBlob(xmlParts);
+      const url = URL.createObjectURL(blob);
+      const name = `${baseName}.docx`;
+      results.push({name, blob, url});
+
+      // Count words roughly
+      const wordCount = allPages.flat().map(i=>i.str).join(' ').split(/\s+/).filter(Boolean).length;
+      addDocxCard(name, url, blob.size, `${totalPg} page${totalPg>1?'s':''} · ~${wordCount.toLocaleString()} words`);
+      markRowDone(row, `<strong>${file.name}</strong> → <strong>${name}</strong> ✅`);
+    } catch(err) {
+      markRowError(row, `Failed: ${file.name} — ${err.message}`);
+      console.error(err);
+    }
+  }
+
+  wrap.style.display = 'block';
+  btn.textContent = '📝 Convert to Word'; btn.disabled = files.length === 0;
+  toast('✅', `${results.length} Word document${results.length>1?'s':''} ready!`);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function addDocxCard(name, url, size, meta) {
+  const list = document.getElementById('docxList');
+  const card = document.createElement('div'); card.className = 'docx-card';
+  card.innerHTML = `
+    <span class="docx-icon">📝</span>
+    <div class="docx-info">
+      <div class="docx-name">${name}</div>
+      <div class="docx-meta">${meta} · ${fmt(size)}</div>
+    </div>
+    <button class="dl-btn" onclick="triggerDownload('${url}','${name}')">⬇️ Download</button>`;
+  list.appendChild(card);
+}
+
+function triggerDownload(url, filename) {
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.style.display='none';
+  document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
+}
+
+function doReset() {
+  results.forEach(r => URL.revokeObjectURL(r.url)); results = []; files = [];
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('docxList').innerHTML = '';
+  document.getElementById('convertBtn').disabled = true;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function addLogRow(text){const box=document.getElementById('logBox');const row=document.createElement('div');row.className='log-row';row.innerHTML=`<div class="spinner"></div><span>${text}</span>`;box.appendChild(row);return row;}
+function setRowText(row,html){row.querySelector('span').innerHTML=html;}
+function markRowDone(row,html){row.querySelector('.spinner').outerHTML='<span>✅</span>';setRowText(row,html);}
+function markRowError(row,html){row.querySelector('.spinner').outerHTML='<span>❌</span>';setRowText(row,`<span style="color:#ff8866">${html}</span>`);}
+function toast(icon,msg){const t=document.getElementById('toast');t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+document.querySelectorAll('.faq-q').forEach(q=>{q.addEventListener('click',()=>{const item=q.closest('.faq-item');const open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(el=>el.classList.remove('open'));if(!open)item.classList.add('open');});});
+</script>
+</body>
+</html>
