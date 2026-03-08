@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resize Image — Free Online Image Resizer | PDFSnip.com</title>
+  <meta name="description" content="Resize any image online for free. Set exact pixels, percentage, or preset sizes. JPG, PNG, WebP supported. No upload, 100% private." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --bg2: #111118; --bg3: #16161f;
+      --surface: #1c1c28; --border: #2a2a3d;
+      --accent: #ff5533; --accent2: #ffcc44;
+      --text: #f0f0f5; --text2: #9999bb;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .nav-btn { background: var(--accent); color: white; text-decoration: none; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 8px; transition: background .2s; }
+    .nav-btn:hover { background: #e04422; }
+
+    .page { max-width: 960px; margin: 0 auto; padding: 100px 24px 80px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--text2); margin-bottom: 28px; }
+    .breadcrumb a { color: var(--text2); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 32px; }
+
+    /* DROP ZONE */
+    .drop-zone { border: 2px dashed var(--border); border-radius: 20px; padding: 52px 32px; text-align: center; background: var(--bg3); cursor: pointer; transition: border-color .2s, background .2s; }
+    .drop-zone:hover, .drop-zone.over { border-color: var(--accent); background: rgba(255,85,51,0.04); }
+    .drop-icon { font-size: 2.8rem; display: block; margin-bottom: 14px; }
+    .drop-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+    .drop-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 20px; }
+    .browse-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: white; border: none; padding: 12px 28px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .browse-btn:hover { opacity: .88; transform: translateY(-1px); }
+
+    /* FILE LIST */
+    .file-list { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .file-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .file-thumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; background: var(--bg3); flex-shrink: 0; }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name { font-size: 0.88rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-dims { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
+    .file-size { font-size: 0.75rem; color: var(--text2); white-space: nowrap; }
+    .file-rm { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 1rem; padding: 4px 8px; border-radius: 6px; flex-shrink: 0; }
+    .file-rm:hover { color: var(--accent); }
+
+    /* SETTINGS */
+    .settings-box { margin-top: 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .settings-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 18px; }
+
+    /* MODE TABS */
+    .mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .mode-tab { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 8px 18px; border-radius: 9px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .mode-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(255,85,51,0.08); }
+
+    /* PRESET SIZES */
+    .presets-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+    .preset-chip { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: all .2s; white-space: nowrap; }
+    .preset-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* INPUTS */
+    .resize-inputs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 0.78rem; color: var(--text2); font-weight: 500; }
+    .num-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; width: 120px; transition: border-color .2s; }
+    .num-input:focus { outline: none; border-color: var(--accent); }
+    .num-input::-webkit-inner-spin-button { opacity: 0.5; }
+    .lock-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 10px 12px; border-radius: 9px; cursor: pointer; font-size: 1rem; transition: all .2s; align-self: flex-end; }
+    .lock-btn.locked { border-color: var(--accent); color: var(--accent); background: rgba(255,85,51,0.08); }
+    .lock-btn:hover { border-color: var(--accent); }
+
+    /* OUTPUT FORMAT */
+    .format-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); align-items: flex-end; }
+    .format-group { display: flex; flex-direction: column; gap: 6px; }
+    .format-group label { font-size: 0.78rem; color: var(--text2); font-weight: 500; }
+    select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; appearance: none; transition: border-color .2s; min-width: 130px; }
+    select:focus { outline: none; border-color: var(--accent); }
+    input[type=range] { -webkit-appearance: none; height: 4px; background: var(--border); border-radius: 4px; padding: 0; cursor: pointer; width: 120px; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--accent); border-radius: 50%; }
+
+    /* CONVERT BUTTON */
+    .convert-wrap { margin-top: 20px; text-align: center; }
+    .convert-btn { background: var(--accent); color: white; font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 800; padding: 15px 44px; border-radius: 12px; border: none; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 10px; }
+    .convert-btn:hover:not(:disabled) { opacity: .9; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,85,51,.35); }
+    .convert-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    /* LOG */
+    .log-box { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .log-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 0.87rem; }
+    .spinner { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESULTS */
+    .results-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; margin-top: 32px; }
+    .results-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; }
+    .results-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .zip-btn { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 9px 20px; border-radius: 9px; font-size: .87rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .zip-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .zip-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .reset-btn { background: var(--accent); color: white; border: none; padding: 9px 20px; border-radius: 9px; font-size: .87rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+    .reset-btn:hover { background: #e04422; }
+
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .result-card { background: var(--bg3); border: 1px solid #44dd88; border-radius: 14px; overflow: hidden; transition: transform .2s; }
+    .result-card:hover { transform: translateY(-2px); }
+    .result-thumb { width: 100%; aspect-ratio: 4/3; object-fit: contain; display: block; background: repeating-conic-gradient(#1c1c28 0% 25%, #111118 0% 50%) 0 0 / 16px 16px; }
+    .result-bottom { padding: 11px 14px; }
+    .result-name { font-size: 0.72rem; color: var(--text2); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .result-dims { font-size: 0.82rem; font-weight: 700; margin-bottom: 2px; }
+    .result-size { font-size: 0.72rem; color: var(--text2); margin-bottom: 10px; }
+    .dl-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 8px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .dl-btn:hover { opacity: .85; }
+    .dl-btn.done { background: #44dd88; }
+
+    /* FAQ */
+    .faq-section { background: var(--bg2); border-top: 1px solid var(--border); padding: 72px 24px; margin-top: 60px; }
+    .faq-inner { max-width: 720px; margin: 0 auto; }
+    .section-tag { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 12px; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 36px; }
+    .faq-list { display: flex; flex-direction: column; gap: 10px; }
+    .faq-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .faq-q { padding: 18px 22px; font-weight: 600; font-size: .92rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 14px; user-select: none; transition: color .2s; }
+    .faq-q:hover { color: var(--accent); }
+    .faq-icon { transition: transform .3s; color: var(--text2); flex-shrink: 0; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); color: var(--accent); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .3s; color: var(--text2); font-size: .88rem; line-height: 1.7; }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 22px 18px; }
+
+    footer { background: var(--bg); border-top: 1px solid var(--border); padding: 48px 24px 28px; }
+    .footer-inner { max-width: 960px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 32px; margin-bottom: 36px; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; }
+    .footer-logo span { color: var(--accent); }
+    .footer-desc { font-size: .84rem; color: var(--text2); margin-top: 8px; max-width: 240px; line-height: 1.6; }
+    .footer-col h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .88rem; margin-bottom: 14px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .footer-links a { color: var(--text2); text-decoration: none; font-size: .84rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-bottom { max-width: 960px; margin: 0 auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; justify-content: space-between; font-size: .78rem; color: var(--text2); flex-wrap: wrap; gap: 8px; }
+
+    #toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; display: flex; align-items: center; gap: 9px; font-size: .88rem; box-shadow: 0 8px 32px rgba(0,0,0,.5); transition: all .3s; transform: translateY(80px); opacity: 0; pointer-events: none; }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    canvas { display: none; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 16px; }
+      .page { padding: 88px 16px 60px; }
+      .num-input { width: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">PDF<span>Snip</span></a>
+  <a href="index.html" class="nav-btn">← All Tools</a>
+</nav>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › Resize Image</div>
+  <h1>Resize Image</h1>
+  <p class="subtitle">Resize JPG, PNG, WebP and GIF images to exact pixels, by percentage, or to common social media presets. Runs 100% in your browser — no upload.</p>
+
+  <!-- DROP ZONE -->
+  <div class="drop-zone" id="dz">
+    <span class="drop-icon">📐</span>
+    <div class="drop-title">Drop your images here</div>
+    <div class="drop-sub">JPG · PNG · WebP · GIF · BMP · Processed locally — nothing uploaded</div>
+    <button class="browse-btn" type="button" id="browseBtn">📂 Choose Images</button>
+    <input type="file" id="fileIn" accept="image/*" multiple style="display:none" />
+    <div class="file-list" id="fileList"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="settings-box">
+    <div class="settings-title">⚙️ Resize Settings</div>
+
+    <!-- MODE TABS -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab_px"  onclick="setMode('px')">📏 Pixels</button>
+      <button class="mode-tab"        id="tab_pct" onclick="setMode('pct')">% Percentage</button>
+      <button class="mode-tab"        id="tab_pre" onclick="setMode('pre')">⚡ Presets</button>
+    </div>
+
+    <!-- PIXEL MODE -->
+    <div id="panel_px">
+      <div class="resize-inputs">
+        <div class="input-group">
+          <label>Width (px)</label>
+          <input type="number" class="num-input" id="px_w" min="1" max="20000" placeholder="Width" oninput="onWidthChange()" />
+        </div>
+        <button class="lock-btn locked" id="lockBtn" onclick="toggleLock()" title="Lock aspect ratio">🔗</button>
+        <div class="input-group">
+          <label>Height (px)</label>
+          <input type="number" class="num-input" id="px_h" min="1" max="20000" placeholder="Height" oninput="onHeightChange()" />
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:0.78rem;color:var(--text2)">💡 Leave one field empty to auto-calculate from aspect ratio.</div>
+    </div>
+
+    <!-- PERCENTAGE MODE -->
+    <div id="panel_pct" style="display:none">
+      <div class="resize-inputs">
+        <div class="input-group">
+          <label>Scale: <strong id="pctVal">50</strong>%</label>
+          <input type="range" id="pct_range" min="1" max="200" value="50" oninput="document.getElementById('pctVal').textContent=this.value" style="width:220px" />
+        </div>
+        <div class="input-group" style="margin-left:12px">
+          <label>Or enter exact %</label>
+          <input type="number" class="num-input" id="pct_num" min="1" max="2000" value="50" oninput="document.getElementById('pct_range').value=Math.min(200,this.value);document.getElementById('pctVal').textContent=this.value" />
+        </div>
+      </div>
+    </div>
+
+    <!-- PRESETS MODE -->
+    <div id="panel_pre" style="display:none">
+      <div class="presets-grid" id="presetsGrid"></div>
+      <div style="margin-top:10px;font-size:0.78rem;color:var(--text2)" id="presetHint">Click a preset to select it. Aspect ratio is preserved by default.</div>
+    </div>
+
+    <!-- OUTPUT FORMAT -->
+    <div class="format-row">
+      <div class="format-group">
+        <label>Output Format</label>
+        <select id="outFmt" onchange="updateQualityVis()">
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png" selected>PNG (keeps transparency)</option>
+          <option value="image/webp">WebP (best compression)</option>
+        </select>
+      </div>
+      <div class="format-group" id="qualGroup">
+        <label>Quality: <strong id="qualVal">92</strong>%</label>
+        <input type="range" id="qualRange" min="10" max="100" value="92" oninput="document.getElementById('qualVal').textContent=this.value" />
+      </div>
+      <div class="format-group">
+        <label>Background (for transparency)</label>
+        <select id="bgColor">
+          <option value="transparent">Transparent (PNG/WebP only)</option>
+          <option value="#ffffff">White</option>
+          <option value="#000000">Black</option>
+          <option value="#ff0000">Red</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUTTON -->
+  <div class="convert-wrap">
+    <button class="convert-btn" id="convertBtn" disabled onclick="runResize()">
+      📐 Resize Images
+    </button>
+  </div>
+
+  <div class="log-box" id="logBox"></div>
+
+  <!-- RESULTS -->
+  <div id="resultsWrap" style="display:none">
+    <div class="results-header">
+      <div class="results-title">✅ Images Resized!</div>
+      <div class="results-actions">
+        <button class="zip-btn" id="zipBtn" onclick="doZip()">📦 Download All as ZIP</button>
+        <button class="reset-btn" onclick="doReset()">🔄 Resize More</button>
+      </div>
+    </div>
+    <div class="results-grid" id="resultsGrid"></div>
+  </div>
+</div>
+
+<canvas id="cv"></canvas>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="faq-inner">
+    <span class="section-tag">FAQ</span>
+    <h2 class="section-title">Common Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">What image formats are supported? <span class="faq-icon">+</span></div>
+        <div class="faq-a">You can upload JPG, PNG, WebP, GIF, BMP, and most other common image formats. Output can be saved as JPG, PNG, or WebP.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Does resizing preserve aspect ratio? <span class="faq-icon">+</span></div>
+        <div class="faq-a">In Pixel mode, the 🔗 lock button keeps the aspect ratio — enter one dimension and the other auto-calculates. In Percentage and Preset modes, aspect ratio is always preserved.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will my image lose quality when resized? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Shrinking an image is lossless quality-wise (you're just removing pixels). Enlarging will soften the image since pixels are being interpolated. For best results, avoid enlarging beyond 150% of the original.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is transparency preserved? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes — if you choose PNG or WebP as output format and set background to "Transparent", alpha channels are fully preserved. JPG does not support transparency.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my image uploaded to a server? <span class="faq-icon">+</span></div>
+        <div class="faq-a">No. All resizing happens using the HTML5 Canvas API directly in your browser. Your images never leave your device.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">PDF<span>Snip</span></div>
+      <div class="footer-desc">Free, fast, private PDF & image tools. No watermarks, no limits.</div>
+    </div>
+    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links">
+      <li><a href="pdf-to-jpg.html">PDF to JPG</a></li>
+      <li><a href="compress-pdf.html">Compress PDF</a></li>
+      <li><a href="merge-pdf.html">Merge PDF</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Image Tools</h4><ul class="footer-links">
+      <li><a href="compress-jpg.html">Compress JPG</a></li>
+      <li><a href="compress-png.html">Compress PNG</a></li>
+      <li><a href="resize-image.html">Resize Image</a></li>
+      <li><a href="compress-svg.html">Compress SVG</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PDFSnip.com</span>
+    <span>Made with ❤️</span>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────
+let files     = [];   // { file, img, origW, origH }
+let blobs     = [];   // { name, blob, url, w, h }
+let mode      = 'px';
+let aspectLocked = true;
+let selectedPreset = null;
+
+// ── PRESETS ──────────────────────────────────────────────────────
+const PRESETS = [
+  { label:'Instagram Post',   w:1080, h:1080, icon:'📷' },
+  { label:'Instagram Story',  w:1080, h:1920, icon:'📱' },
+  { label:'Facebook Cover',   w:820,  h:312,  icon:'👤' },
+  { label:'Facebook Post',    w:1200, h:630,  icon:'📘' },
+  { label:'Twitter/X Post',   w:1200, h:675,  icon:'🐦' },
+  { label:'Twitter/X Header', w:1500, h:500,  icon:'🐦' },
+  { label:'LinkedIn Banner',  w:1584, h:396,  icon:'💼' },
+  { label:'YouTube Thumb',    w:1280, h:720,  icon:'▶️' },
+  { label:'HD (720p)',        w:1280, h:720,  icon:'🖥️' },
+  { label:'Full HD (1080p)',  w:1920, h:1080, icon:'🖥️' },
+  { label:'4K UHD',          w:3840, h:2160, icon:'🖥️' },
+  { label:'A4 at 150dpi',    w:1240, h:1754, icon:'📄' },
+  { label:'A4 at 300dpi',    w:2480, h:3508, icon:'📄' },
+  { label:'Thumbnail 320px', w:320,  h:null, icon:'🖼️' },
+  { label:'Icon 512px',      w:512,  h:512,  icon:'🎨' },
+  { label:'Favicon 32px',    w:32,   h:32,   icon:'🔖' },
+];
+
+function buildPresets() {
+  const grid = document.getElementById('presetsGrid');
+  PRESETS.forEach((p, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'preset-chip';
+    chip.id = 'preset_' + i;
+    chip.innerHTML = `${p.icon} ${p.label}<br><span style="font-size:0.7rem;opacity:0.7">${p.w}×${p.h ?? 'auto'}</span>`;
+    chip.style.textAlign = 'left';
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.preset-chip').forEach(c => { c.style.borderColor=''; c.style.color=''; });
+      chip.style.borderColor = 'var(--accent2)';
+      chip.style.color = 'var(--accent2)';
+      selectedPreset = p;
+      document.getElementById('presetHint').textContent = `Selected: ${p.label} (${p.w}×${p.h ?? 'auto'})`;
+    });
+    grid.appendChild(chip);
+  });
+}
+buildPresets();
+
+// ── MODE ─────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  ['px','pct','pre'].forEach(id => {
+    document.getElementById('panel_' + id).style.display = id === m ? 'block' : 'none';
+    document.getElementById('tab_'   + id).classList.toggle('active', id === m);
+  });
+  selectedPreset = null;
+}
+
+// ── ASPECT LOCK ──────────────────────────────────────────────────
+function toggleLock() {
+  aspectLocked = !aspectLocked;
+  const btn = document.getElementById('lockBtn');
+  btn.classList.toggle('locked', aspectLocked);
+  btn.textContent = aspectLocked ? '🔗' : '🔓';
+}
+
+function onWidthChange() {
+  if (!aspectLocked || !files.length) return;
+  const w = parseInt(document.getElementById('px_w').value);
+  if (!w) { document.getElementById('px_h').value = ''; return; }
+  const ratio = files[0].origH / files[0].origW;
+  document.getElementById('px_h').value = Math.round(w * ratio);
+}
+
+function onHeightChange() {
+  if (!aspectLocked || !files.length) return;
+  const h = parseInt(document.getElementById('px_h').value);
+  if (!h) { document.getElementById('px_w').value = ''; return; }
+  const ratio = files[0].origW / files[0].origH;
+  document.getElementById('px_w').value = Math.round(h * ratio);
+}
+
+// ── QUALITY VIS ──────────────────────────────────────────────────
+function updateQualityVis() {
+  const fmt = document.getElementById('outFmt').value;
+  document.getElementById('qualGroup').style.opacity = fmt === 'image/png' ? '0.4' : '1';
+  document.getElementById('qualGroup').style.pointerEvents = fmt === 'image/png' ? 'none' : 'auto';
+}
+
+// ── FILE INPUT ───────────────────────────────────────────────────
+document.getElementById('browseBtn').addEventListener('click', () => document.getElementById('fileIn').click());
+document.getElementById('fileIn').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value = ''; });
+
+const dz = document.getElementById('dz');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('over');
+  addFiles([...e.dataTransfer.files].filter(f => f.type.startsWith('image/')));
+});
+
+function addFiles(incoming) {
+  const imgs = incoming.filter(f => f.type.startsWith('image/'));
+  if (!imgs.length) { toast('⚠️', 'Please select image files'); return; }
+  imgs.forEach(file => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      files.push({ file, img, origW: img.naturalWidth, origH: img.naturalHeight, url });
+      // Pre-fill width/height with first image dimensions
+      if (files.length === 1) {
+        document.getElementById('px_w').value = img.naturalWidth;
+        document.getElementById('px_h').value = img.naturalHeight;
+      }
+      renderList();
+    };
+    img.src = url;
+  });
+}
+
+function renderList() {
+  const list = document.getElementById('fileList'); list.innerHTML = '';
+  files.forEach((f, i) => {
+    const row = document.createElement('div'); row.className = 'file-row';
+    const thumb = document.createElement('img'); thumb.className = 'file-thumb'; thumb.src = f.url;
+    const info  = document.createElement('div'); info.className = 'file-info';
+    info.innerHTML = `<div class="file-name">${f.file.name}</div><div class="file-dims">${f.origW} × ${f.origH} px</div>`;
+    const size = document.createElement('span'); size.className = 'file-size'; size.textContent = fmt(f.file.size);
+    const rm   = document.createElement('button'); rm.className = 'file-rm'; rm.textContent = '✕';
+    rm.addEventListener('click', () => { URL.revokeObjectURL(f.url); files.splice(i, 1); renderList(); });
+    row.appendChild(thumb); row.appendChild(info); row.appendChild(size); row.appendChild(rm);
+    list.appendChild(row);
+  });
+  document.getElementById('convertBtn').disabled = files.length === 0;
+}
+
+// ── RESIZE ───────────────────────────────────────────────────────
+async function runResize() {
+  if (!files.length) return;
+  if (!validateSettings()) return;
+
+  const btn = document.getElementById('convertBtn');
+  btn.disabled = true; btn.textContent = '⚙️ Resizing…';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('resultsGrid').innerHTML = '';
+  blobs.forEach(b => URL.revokeObjectURL(b.url)); blobs = [];
+
+  const outFmt  = document.getElementById('outFmt').value;
+  const quality = parseInt(document.getElementById('qualRange').value) / 100;
+  const bgColor = document.getElementById('bgColor').value;
+  const canvas  = document.getElementById('cv');
+  const ctx     = canvas.getContext('2d');
+  const ext     = outFmt === 'image/jpeg' ? '.jpg' : outFmt === 'image/webp' ? '.webp' : '.png';
+
+  for (const f of files) {
+    const row = addLogRow(`Resizing <strong>${f.file.name}</strong>…`);
+    try {
+      const { tw, th } = getTargetDims(f);
+      if (!tw || !th || tw < 1 || th < 1) throw new Error('Invalid dimensions — check your settings');
+
+      canvas.width  = tw;
+      canvas.height = th;
+      ctx.clearRect(0, 0, tw, th);
+
+      // Background fill
+      if (bgColor === 'transparent') {
+        ctx.clearRect(0, 0, tw, th);
+      } else {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, tw, th);
+      }
+
+      // Draw resized image with smooth interpolation
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(f.img, 0, 0, tw, th);
+
+      const blob = await canvasToBlob(canvas, outFmt, quality);
+      const url  = URL.createObjectURL(blob);
+      const baseName = f.file.name.replace(/\.[^.]+$/, '');
+      const name = `${baseName}_${tw}x${th}${ext}`;
+      blobs.push({ name, blob, url, w: tw, h: th });
+      addResultCard(name, url, blobs.length - 1, tw, th, blob.size, f.origW, f.origH);
+      markRowDone(row, `<strong>${f.file.name}</strong> — ${f.origW}×${f.origH} → <span style="color:#44dd88;font-weight:700">${tw}×${th} px</span> · ${fmt(blob.size)}`);
+    } catch (err) {
+      markRowError(row, `${f.file.name} — ${err.message}`);
+    }
+  }
+
+  document.getElementById('resultsWrap').style.display = 'block';
+  btn.textContent = '📐 Resize Images'; btn.disabled = false;
+  toast('✅', `${blobs.length} image${blobs.length > 1 ? 's' : ''} resized!`);
+  document.getElementById('resultsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function validateSettings() {
+  if (mode === 'px') {
+    const w = parseInt(document.getElementById('px_w').value);
+    const h = parseInt(document.getElementById('px_h').value);
+    if ((!w && !h)) { toast('⚠️', 'Please enter a width or height'); return false; }
+  }
+  if (mode === 'pct') {
+    const pct = parseInt(document.getElementById('pct_num').value);
+    if (!pct || pct < 1) { toast('⚠️', 'Please enter a valid percentage'); return false; }
+  }
+  if (mode === 'pre' && !selectedPreset) { toast('⚠️', 'Please select a preset size'); return false; }
+  return true;
+}
+
+function getTargetDims(f) {
+  if (mode === 'px') {
+    let w = parseInt(document.getElementById('px_w').value) || 0;
+    let h = parseInt(document.getElementById('px_h').value) || 0;
+    const ratio = f.origW / f.origH;
+    if (w && !h) h = Math.round(w / ratio);
+    if (h && !w) w = Math.round(h * ratio);
+    return { tw: w, th: h };
+  }
+  if (mode === 'pct') {
+    const pct = parseFloat(document.getElementById('pct_num').value) / 100;
+    return { tw: Math.round(f.origW * pct), th: Math.round(f.origH * pct) };
+  }
+  if (mode === 'pre' && selectedPreset) {
+    const p = selectedPreset;
+    if (p.w && p.h) return { tw: p.w, th: p.h };
+    // only width defined — scale height proportionally
+    const ratio = f.origH / f.origW;
+    return { tw: p.w, th: Math.round(p.w * ratio) };
+  }
+  return { tw: f.origW, th: f.origH };
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error('Canvas toBlob failed'));
+    }, type, type === 'image/png' ? undefined : quality);
+  });
+}
+
+// ── RESULT CARD ──────────────────────────────────────────────────
+function addResultCard(name, url, idx, w, h, size, origW, origH) {
+  const grid = document.getElementById('resultsGrid');
+  const card = document.createElement('div'); card.className = 'result-card';
+  const img  = document.createElement('img'); img.className = 'result-thumb'; img.src = url; img.alt = name; img.loading = 'lazy';
+  const bottom = document.createElement('div'); bottom.className = 'result-bottom';
+  bottom.innerHTML = `
+    <div class="result-name">${name}</div>
+    <div class="result-dims">${w} × ${h} px</div>
+    <div class="result-size">${fmt(size)} · was ${origW}×${origH}</div>`;
+  const dlBtn = document.createElement('button'); dlBtn.className = 'dl-btn'; dlBtn.textContent = '↓ Download';
+  dlBtn.addEventListener('click', () => {
+    triggerDownload(blobs[idx].url, blobs[idx].name);
+    dlBtn.textContent = '✓ Saved'; dlBtn.classList.add('done');
+    setTimeout(() => { dlBtn.textContent = '↓ Download'; dlBtn.classList.remove('done'); }, 2500);
+  });
+  bottom.appendChild(dlBtn); card.appendChild(img); card.appendChild(bottom);
+  grid.appendChild(card);
+}
+
+// ── DOWNLOAD / ZIP ───────────────────────────────────────────────
+function triggerDownload(url, filename) {
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.style.display = 'none';
+  document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200);
+}
+
+async function doZip() {
+  if (!blobs.length) return;
+  const btn = document.getElementById('zipBtn'); btn.disabled = true; btn.textContent = '⏳ Building ZIP…';
+  try {
+    const zip = new JSZip();
+    blobs.forEach(({ name, blob }) => zip.file(name, blob));
+    const zb = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+    triggerDownload(URL.createObjectURL(zb), 'PDFSnip_resized.zip');
+    toast('📦', 'ZIP downloaded!');
+  } catch(e) { toast('❌', 'ZIP error: ' + e.message); }
+  btn.disabled = false; btn.textContent = '📦 Download All as ZIP';
+}
+
+// ── RESET ────────────────────────────────────────────────────────
+function doReset() {
+  blobs.forEach(b => URL.revokeObjectURL(b.url)); blobs = [];
+  files.forEach(f => URL.revokeObjectURL(f.url)); files = [];
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('resultsGrid').innerHTML = '';
+  document.getElementById('convertBtn').disabled = true;
+  document.getElementById('px_w').value = '';
+  document.getElementById('px_h').value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function fmt(b) { if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
+
+function addLogRow(html) {
+  const box = document.getElementById('logBox');
+  const row = document.createElement('div'); row.className = 'log-row';
+  row.innerHTML = `<div class="spinner"></div><span>${html}</span>`;
+  box.appendChild(row); return row;
+}
+function setRowText(row, html) { row.querySelector('span').innerHTML = html; }
+function markRowDone(row, html) { row.querySelector('.spinner').outerHTML = '<span>✅</span>'; setRowText(row, html); }
+function markRowError(row, html) { row.querySelector('.spinner').outerHTML = '<span>❌</span>'; setRowText(row, `<span style="color:#ff8866">${html}</span>`); }
+
+function toast(icon, msg) {
+  const t = document.getElementById('toast'); t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.faq-item'); const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
