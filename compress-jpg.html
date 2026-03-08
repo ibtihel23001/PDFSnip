@@ -5,214 +5,346 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Compress JPG — Reduce JPEG Size Free | PDFSnip.com</title>
   <meta name="description" content="Compress JPG images online for free. Reduce file size without visible quality loss. No watermark, instant download." />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--surface:#1c1c28;--border:#2a2a3d;--accent:#ffcc44;--text:#f0f0f5;--text2:#9999bb; }
+    html { scroll-behavior: smooth; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    nav { position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border); }
+    .logo { font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text);text-decoration:none; }
+    .logo span { color:#ff5533; }
+    .nav-btn { background:#ff5533;color:white;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 18px;border-radius:8px;transition:background 0.2s; }
+    .nav-btn:hover { background:#e04422; }
+    .page { max-width:860px;margin:0 auto;padding:100px 24px 80px; }
+    .breadcrumb { font-size:0.8rem;color:var(--text2);margin-bottom:28px; }
+    .breadcrumb a { color:var(--text2);text-decoration:none; }
+    .breadcrumb a:hover { color:var(--accent); }
+    h1 { font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px; }
+    .subtitle { color:var(--text2);font-size:1rem;margin-bottom:36px; }
+    .drop-zone { border:2px dashed var(--border);border-radius:20px;padding:52px 32px;text-align:center;background:var(--bg3);cursor:pointer;transition:border-color 0.2s,background 0.2s; }
+    .drop-zone:hover,.drop-zone.over { border-color:var(--accent);background:rgba(255,204,68,0.04); }
+    .drop-icon { font-size:2.8rem;display:block;margin-bottom:14px; }
+    .drop-title { font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px; }
+    .drop-sub { color:var(--text2);font-size:0.85rem;margin-bottom:20px; }
+    .browse-btn { display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#111;border:none;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s; }
+    .browse-btn:hover { opacity:0.88;transform:translateY(-1px); }
+    .file-list { margin-top:20px;display:flex;flex-direction:column;gap:8px; }
+    .file-row { display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px; }
+    .file-row-name { flex:1;font-size:0.88rem;font-weight:500; }
+    .file-row-size { font-size:0.76rem;color:var(--text2); }
+    .file-row-rm { background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px;transition:all 0.2s; }
+    .file-row-rm:hover { color:#ff5533;background:rgba(255,85,51,0.1); }
+    .settings-box { margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px; }
+    .settings-title { font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:18px; }
+    .settings-row { display:flex;gap:16px;flex-wrap:wrap; }
+    .setting { display:flex;flex-direction:column;gap:7px;flex:1;min-width:160px; }
+    .setting label { font-size:0.78rem;color:var(--text2);font-weight:500; }
+    select,input[type=range] { background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;appearance:none;transition:border-color 0.2s; }
+    select:focus { outline:none;border-color:var(--accent); }
+    input[type=range] { -webkit-appearance:none;height:4px;background:var(--border);padding:0;cursor:pointer; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%; }
+    .convert-wrap { margin-top:20px;text-align:center; }
+    .convert-btn { background:var(--accent);color:#111;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;padding:15px 44px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:10px; }
+    .convert-btn:hover:not(:disabled) { opacity:0.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,204,68,0.3); }
+    .convert-btn:disabled { opacity:0.45;cursor:not-allowed;transform:none; }
+    .log-box { margin-top:20px;display:flex;flex-direction:column;gap:8px; }
+    .log-row { display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.87rem; }
+    .spinner { width:18px;height:18px;flex-shrink:0;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .results-header { display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;margin-top:32px; }
+    .results-title { font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem; }
+    .results-actions { display:flex;gap:10px;flex-wrap:wrap; }
+    .zip-btn { background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px; }
+    .zip-btn:hover { border-color:var(--accent);color:var(--accent); }
+    .zip-btn:disabled { opacity:0.5;cursor:not-allowed; }
+    .reset-btn { background:#ff5533;color:white;border:none;padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:background 0.2s; }
+    .reset-btn:hover { background:#e04422; }
+    .grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px; }
+    .card { background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.2s,border-color 0.2s; }
+    .card:hover { transform:translateY(-2px);border-color:var(--accent); }
+    .card-thumb { width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--surface); }
+    .card-bottom { padding:9px 12px; }
+    .card-stats { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
+    .card-name { font-size:0.7rem;color:var(--text2);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .card-saving { font-size:0.75rem;font-weight:700;color:#44dd88; }
+    .card-sizes { font-size:0.7rem;color:var(--text2); }
+    .dl-btn { width:100%;background:var(--accent);color:#111;border:none;padding:7px;border-radius:7px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:opacity 0.2s; }
+    .dl-btn:hover { opacity:0.85; }
+    .dl-btn.done { background:#44dd88;color:white; }
+    .faq-section { background:var(--bg2);border-top:1px solid var(--border);padding:72px 24px;margin-top:60px; }
+    .faq-inner { max-width:720px;margin:0 auto; }
+    .section-tag { font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:12px; }
+    .section-title { font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:36px; }
+    .faq-list { display:flex;flex-direction:column;gap:10px; }
+    .faq-item { background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden; }
+    .faq-q { padding:18px 22px;font-weight:600;font-size:0.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;user-select:none;transition:color 0.2s; }
+    .faq-q:hover { color:var(--accent); }
+    .faq-icon { transition:transform 0.3s;color:var(--text2);flex-shrink:0; }
+    .faq-item.open .faq-icon { transform:rotate(45deg);color:var(--accent); }
+    .faq-a { max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s;color:var(--text2);font-size:0.88rem;line-height:1.7; }
+    .faq-item.open .faq-a { max-height:300px;padding:0 22px 18px; }
+    footer { background:var(--bg);border-top:1px solid var(--border);padding:48px 24px 28px; }
+    .footer-inner { max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:36px; }
+    .footer-logo { font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800; }
+    .footer-logo span { color:#ff5533; }
+    .footer-desc { font-size:0.84rem;color:var(--text2);margin-top:8px;max-width:240px;line-height:1.6; }
+    .footer-col h4 { font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px; }
+    .footer-links { list-style:none;display:flex;flex-direction:column;gap:9px; }
+    .footer-links a { color:var(--text2);text-decoration:none;font-size:0.84rem;transition:color 0.2s; }
+    .footer-links a:hover { color:#ff5533; }
+    .footer-bottom { max-width:860px;margin:0 auto;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);flex-wrap:wrap;gap:8px; }
+    #toast { position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:9px;font-size:0.88rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all 0.3s;transform:translateY(80px);opacity:0;pointer-events:none; }
+    #toast.show { transform:translateY(0);opacity:1; }
+    canvas { display:none; }
+  </style>
 </head>
 <body>
-
 <nav>
-  <a href="index.html" class="nav-logo">PDF<span>Snip</span></a>
-  <ul class="nav-links">
-    <li><a href="index.html#tools">All Tools</a></li>
-    <li><a href="index.html#how">How It Works</a></li>
-    <li><a href="index.html#faq">FAQ</a></li>
-    <li><a href="index.html" class="nav-cta">All Tools →</a></li>
-  </ul>
+  <a href="index.html" class="logo">PDF<span>Snip</span></a>
+  <a href="index.html" class="nav-btn">← All Tools</a>
 </nav>
 
-<div class="converter-page">
-  <div class="page-breadcrumb">
-    <a href="index.html">Home</a>
-    <span>›</span>
-    <span>Compress JPG</span>
-  </div>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › Compress JPG</div>
+  <h1>Compress JPG</h1>
+  <p class="subtitle">Reduce your JPEG image file sizes by up to 90% while keeping them sharp. Real compression — runs in your browser, nothing uploaded.</p>
 
-  <div class="page-hero">
-    <h1>🖼️ Compress JPG</h1>
-    <p>Reduce your JPEG image file sizes by up to 80% while keeping them looking great. Perfect for web, email, and social media.</p>
-  </div>
-
-  <div class="drop-zone" id="dropZone">
+  <div class="drop-zone" id="dz">
     <span class="drop-icon">🖼️</span>
-    <div class="drop-title">Drop your file here</div>
-    <div class="drop-sub">or click to browse · JPG/JPEG files up to 50MB</div>
-    <button class="btn-primary" onclick="document.querySelector('.drop-input').click()">
-      📂 Choose File
-    </button>
-    <input type="file" class="drop-input" accept=".jpg,.jpeg,image/jpeg" multiple />
-    <div class="file-list"></div>
+    <div class="drop-title">Drop your JPG images here</div>
+    <div class="drop-sub">or click below · JPG/JPEG files · Processed 100% locally</div>
+    <button class="browse-btn" type="button" id="browseBtn">📂 Choose JPG Files</button>
+    <input type="file" id="fileIn" accept=".jpg,.jpeg,image/jpeg" multiple style="display:none" />
+    <div class="file-list" id="fileList"></div>
   </div>
 
-  <div class="tool-options">
-    <div class="options-title">⚙️ Settings</div>
-    <div class="options-row">
-      <div class="option-group">
-        <label class="option-label">Quality</label>
-        <select class="option-select" id="quality">
-          <option value="auto">Auto (Smart Compress)</option>
-          <option value="high">High — 85%</option>
-          <option value="medium">Medium — 70%</option>
-          <option value="low">Low — 50%</option>
+  <div class="settings-box">
+    <div class="settings-title">⚙️ Compression Settings</div>
+    <div class="settings-row">
+      <div class="setting">
+        <label>Quality: <strong id="qv">80</strong>%</label>
+        <input type="range" id="jpgQ" min="10" max="100" value="80" oninput="document.getElementById('qv').textContent=this.value" />
+      </div>
+      <div class="setting">
+        <label>Resize (optional)</label>
+        <select id="resize">
+          <option value="1" selected>Original Size</option>
+          <option value="0.75">75% of original</option>
+          <option value="0.5">50% of original</option>
+          <option value="0.25">25% of original</option>
         </select>
       </div>
-      <div class="option-group">
-        <label class="option-label">Custom Quality: <span id="customVal">80</span>%</label>
-        <input type="range" min="10" max="100" value="80" id="custom"
-          oninput="document.getElementById('customVal').textContent = this.value" />
-      </div>
-
     </div>
   </div>
 
-  <div class="convert-btn-wrap">
-    <button class="btn-convert" onclick="startConvert()" disabled style="background:var(--card-accent,var(--accent))">
-      🗜️ Compress JPG
-    </button>
-    <div class="progress-bar-wrap">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.8rem;color:var(--text2)">
-        <span>Processing...</span>
-        <span id="progressPct">0%</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="background:var(--card-accent,var(--accent))"></div>
-      </div>
-    </div>
+  <div class="convert-wrap">
+    <button class="convert-btn" id="convertBtn" disabled onclick="runCompress()">🗜️ Compress Images</button>
   </div>
+  <div class="log-box" id="logBox"></div>
 
-  <div class="results-section" id="results">
+  <div id="resultsWrap" style="display:none">
     <div class="results-header">
-      <div class="results-title">✅ Your File Is Ready</div>
-      <button class="btn-primary" onclick="downloadAll()" style="font-size:0.88rem;padding:10px 20px;">
-        📦 Download All
-      </button>
+      <div class="results-title">✅ Images Compressed!</div>
+      <div class="results-actions">
+        <button class="zip-btn" id="zipBtn" onclick="doZip()">📦 Download All as ZIP</button>
+        <button class="reset-btn" onclick="doReset()">🔄 Compress More</button>
+      </div>
     </div>
-    <div class="results-grid">
-      <div class="result-card">
-        <div style="padding:28px;text-align:center">
-          <div style="font-size:3rem;margin-bottom:12px">🖼️</div>
-          <div style="font-size:0.9rem;font-weight:600;margin-bottom:6px">output_file.jpg</div>
-          <div style="font-size:0.78rem;color:var(--text2)">Ready to download</div>
-        </div>
-        <div class="result-card-bottom">
-          <span class="result-name">Processed successfully</span>
-          <button class="btn-dl" onclick="showToast('✅','Download started!')">↓ Save</button>
-        </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+<canvas id="cv"></canvas>
+
+<div class="faq-section">
+  <div class="faq-inner">
+    <span class="section-tag">FAQ</span>
+    <h2 class="section-title">Common Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">How does JPG compression work? <span class="faq-icon">+</span></div>
+        <div class="faq-a">We redraw your image onto an HTML5 Canvas and re-export it at your chosen quality level. Lower quality = smaller file. At 70–85%, most people can't tell the difference visually.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my image uploaded anywhere? <span class="faq-icon">+</span></div>
+        <div class="faq-a">No. Everything runs locally in your browser. Your images never leave your device.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What quality setting should I use? <span class="faq-icon">+</span></div>
+        <div class="faq-a">For web/email: 70–80%. For social media: 80–85%. For archiving or printing: 90–95%. Our default of 80% is a great balance for most use cases.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I compress multiple JPGs at once? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes! Upload as many files as you want. They're all processed and you can download them one by one or as a single ZIP archive.</div>
       </div>
     </div>
   </div>
 </div>
 
-<section class="faq-section" id="faq">
-  <div class="faq-inner">
-    <div class="section-header">
-      <div class="section-tag">FAQ</div>
-      <h2 class="section-title">Compress JPG — Common Questions</h2>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <div class="faq-q">How does JPG compression work? <span class="faq-icon">+</span></div>
-        <div class="faq-a">JPG uses lossy compression — it selectively discards image data that is less visible to the human eye. Our tool balances file size reduction with visual quality to give you the best possible result.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Will there be quality loss? <span class="faq-icon">+</span></div>
-        <div class="faq-a">All JPG compression involves some quality trade-off. At 80–90% quality settings, the difference is virtually invisible. Our Auto mode intelligently chooses the right level for each image.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Can I compress multiple JPGs at once? <span class="faq-icon">+</span></div>
-        <div class="faq-a">Yes! Upload multiple JPG files in one go and compress them all simultaneously. Download each individually or as a single ZIP archive.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Does it work with JPEG files too? <span class="faq-icon">+</span></div>
-        <div class="faq-a">JPG and JPEG are the same format — just different file extensions. Our compressor accepts both .jpg and .jpeg files.</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section style="padding:60px 40px;background:var(--bg2);border-top:1px solid var(--border)">
-  <div style="max-width:1100px;margin:0 auto">
-    <div class="section-tag">Related Tools</div>
-    <h2 class="section-title" style="margin:12px 0 32px">You Might Also Need</h2>
-    <div style="display:flex;gap:16px;flex-wrap:wrap">
-      <a href="compress-png.html" class="btn-secondary" style="text-decoration:none">Compress PNG →</a>
-      <a href="jpg-to-png.html" class="btn-secondary" style="text-decoration:none">JPG to PNG →</a>
-      <a href="resize-image.html" class="btn-secondary" style="text-decoration:none">Resize Image →</a>
-
-    </div>
-  </div>
-</section>
-
 <footer>
   <div class="footer-inner">
-    <div class="footer-brand">
-      <div class="nav-logo">PDF<span style="color:var(--accent)">Snip</span></div>
-      <p>Free, fast, and private PDF and image tools for everyone. No watermarks, no limits.</p>
-    </div>
-    <div>
-      <div class="footer-col-title">PDF Tools</div>
-      <ul class="footer-links">
-        <li><a href="pdf-to-jpg.html">PDF to JPG</a></li>
-        <li><a href="compress-pdf.html">Compress PDF</a></li>
-        <li><a href="merge-pdf.html">Merge PDF</a></li>
-        <li><a href="split-pdf.html">Split PDF</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Image Tools</div>
-      <ul class="footer-links">
-        <li><a href="compress-jpg.html">Compress JPG</a></li>
-        <li><a href="compress-png.html">Compress PNG</a></li>
-        <li><a href="compress-svg.html">Compress SVG</a></li>
-        <li><a href="jpg-to-png.html">JPG to PNG</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links">
-        <li><a href="#">About</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </div>
+    <div><div class="footer-logo">PDF<span>Snip</span></div><div class="footer-desc">Free, fast, private PDF & image tools. No watermarks, no limits.</div></div>
+    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links"><li><a href="pdf-to-jpg.html">PDF to JPG</a></li><li><a href="compress-pdf.html">Compress PDF</a></li><li><a href="merge-pdf.html">Merge PDF</a></li></ul></div>
+    <div class="footer-col"><h4>Image Tools</h4><ul class="footer-links"><li><a href="compress-jpg.html">Compress JPG</a></li><li><a href="compress-png.html">Compress PNG</a></li><li><a href="compress-svg.html">Compress SVG</a></li></ul></div>
   </div>
-  <div class="footer-bottom">
-    <span>© 2025 PDFSnip.com — All rights reserved.</span>
-    <span>Made with ❤️ for the web</span>
-  </div>
+  <div class="footer-bottom"><span>© 2025 PDFSnip.com</span><span>Made with ❤️</span></div>
 </footer>
+<div id="toast"></div>
 
-<style>:root { --card-accent: #ff5533; }</style>
-<script src="js/main.js"></script>
 <script>
-window.startConvert = function() {
-  const btn = document.querySelector('.btn-convert');
-  const progress = document.querySelector('.progress-bar-wrap');
-  const fill = document.getElementById('progressFill');
-  const pct = document.getElementById('progressPct');
-  const results = document.querySelector('.results-section');
-  if (!selectedFiles.length) return;
-  btn.disabled = true;
-  btn.innerHTML = '⚙️ Processing...';
-  progress.classList.add('show');
-  let p = 0;
-  const iv = setInterval(() => {
-    p += Math.random() * 16;
-    if (p >= 100) {
-      p = 100; clearInterval(iv);
-      fill.style.width = '100%'; pct.textContent = '100%';
-      setTimeout(() => {
-        btn.innerHTML = '🔄 Process More';
-        btn.disabled = false;
-        results.classList.add('show');
-        showToast('✅', 'Done! Your file is ready to download.');
-      }, 400);
+let files = [], blobs = [];
+
+document.getElementById('browseBtn').addEventListener('click', () => document.getElementById('fileIn').click());
+document.getElementById('fileIn').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value=''; });
+
+const dz = document.getElementById('dz');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); addFiles([...e.dataTransfer.files]); });
+
+function addFiles(incoming) {
+  const imgs = incoming.filter(f => f.type === 'image/jpeg' || f.name.toLowerCase().match(/\.jpe?g$/));
+  if (!imgs.length) { toast('⚠️','Please select JPG/JPEG files only'); return; }
+  files = [...files, ...imgs];
+  renderList();
+}
+function renderList() {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  files.forEach((f,i) => {
+    const d = document.createElement('div'); d.className='file-row';
+    d.innerHTML=`<span>🖼️</span><span class="file-row-name">${f.name}</span><span class="file-row-size">${fmt(f.size)}</span><button class="file-row-rm" onclick="removeFile(${i})">✕</button>`;
+    list.appendChild(d);
+  });
+  document.getElementById('convertBtn').disabled = files.length===0;
+}
+function removeFile(i) { files.splice(i,1); renderList(); }
+function fmt(b) { if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+
+async function runCompress() {
+  if(!files.length) return;
+  const btn = document.getElementById('convertBtn');
+  btn.disabled=true; btn.textContent='⚙️ Compressing…';
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('resultsWrap').style.display='none';
+  document.getElementById('grid').innerHTML='';
+  blobs=[];
+
+  const quality = parseInt(document.getElementById('jpgQ').value)/100;
+  const resizeF = parseFloat(document.getElementById('resize').value);
+  const canvas = document.getElementById('cv');
+  const ctx = canvas.getContext('2d');
+
+  for(const file of files) {
+    const row = addLogRow(`Compressing ${file.name}…`);
+    try {
+      const blob = await compressImage(file, quality, resizeF, canvas, ctx);
+      const url = URL.createObjectURL(blob);
+      const name = file.name.replace(/\.jpe?g$/i,'')+'_compressed.jpg';
+      blobs.push({name,blob,url,origSize:file.size,newSize:blob.size});
+      const saving = Math.round((1 - blob.size/file.size)*100);
+      addCard(name, url, blobs.length-1, file.size, blob.size, saving);
+      markRowDone(row, `<strong>${file.name}</strong> — ${fmt(file.size)} → ${fmt(blob.size)} <span style="color:#44dd88">(${saving}% smaller)</span>`);
+    } catch(e) {
+      markRowError(row, `Failed: ${file.name} — ${e.message}`);
     }
-    fill.style.width = p + '%';
-    pct.textContent = Math.round(p) + '%';
-  }, 150);
-};
+  }
+
+  document.getElementById('resultsWrap').style.display='block';
+  btn.textContent='🗜️ Compress Images'; btn.disabled=false;
+  toast('✅', `${blobs.length} image${blobs.length>1?'s':''} compressed!`);
+  document.getElementById('resultsWrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function compressImage(file, quality, resizeF, canvas, ctx) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      canvas.width  = Math.round(img.naturalWidth  * resizeF);
+      canvas.height = Math.round(img.naturalHeight * resizeF);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#ffffff';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => {
+        if(blob) resolve(blob);
+        else reject(new Error('toBlob returned null'));
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => reject(new Error('Could not load image'));
+    img.src = url;
+  });
+}
+
+function addCard(name, url, idx, origSize, newSize, saving) {
+  const grid = document.getElementById('grid');
+  const card = document.createElement('div'); card.className='card';
+  const img = document.createElement('img'); img.className='card-thumb'; img.src=url; img.alt=name; img.loading='lazy';
+  const bottom = document.createElement('div'); bottom.className='card-bottom';
+  bottom.innerHTML=`
+    <div class="card-name">${name}</div>
+    <div class="card-stats">
+      <span class="card-sizes">${fmt(origSize)} → ${fmt(newSize)}</span>
+      <span class="card-saving">-${saving}%</span>
+    </div>`;
+  const dlBtn = document.createElement('button'); dlBtn.className='dl-btn'; dlBtn.textContent='↓ Download';
+  dlBtn.addEventListener('click', () => {
+    triggerDownload(blobs[idx].url, blobs[idx].name);
+    dlBtn.textContent='✓ Saved'; dlBtn.classList.add('done');
+    setTimeout(()=>{ dlBtn.textContent='↓ Download'; dlBtn.classList.remove('done'); }, 2500);
+  });
+  bottom.appendChild(dlBtn); card.appendChild(img); card.appendChild(bottom); grid.appendChild(card);
+}
+
+function triggerDownload(url, filename) {
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.style.display='none';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => document.body.removeChild(a), 200);
+}
+
+async function doZip() {
+  if(!blobs.length) return;
+  const btn = document.getElementById('zipBtn');
+  btn.disabled=true; btn.textContent='⏳ Building ZIP…';
+  try {
+    const zip = new JSZip();
+    blobs.forEach(({name,blob}) => zip.file(name, blob));
+    const zipBlob = await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+    triggerDownload(URL.createObjectURL(zipBlob), 'PDFSnip_compressed.zip');
+    toast('📦','ZIP downloaded!');
+  } catch(e) { toast('❌','ZIP error: '+e.message); }
+  btn.disabled=false; btn.textContent='📦 Download All as ZIP';
+}
+
+function doReset() {
+  blobs.forEach(b => URL.revokeObjectURL(b.url)); blobs=[]; files=[];
+  document.getElementById('fileList').innerHTML='';
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('resultsWrap').style.display='none';
+  document.getElementById('grid').innerHTML='';
+  document.getElementById('convertBtn').disabled=true;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function addLogRow(text) {
+  const box=document.getElementById('logBox'); const row=document.createElement('div'); row.className='log-row';
+  row.innerHTML=`<div class="spinner"></div><span>${text}</span>`; box.appendChild(row); return row;
+}
+function setRowText(row,html){ row.querySelector('span').innerHTML=html; }
+function markRowDone(row,html){ row.querySelector('.spinner').outerHTML='<span>✅</span>'; setRowText(row,html); }
+function markRowError(row,html){ row.querySelector('.spinner').outerHTML='<span>❌</span>'; setRowText(row,`<span style="color:#ff8866">${html}</span>`); }
+
+function toast(icon,msg) {
+  const t=document.getElementById('toast'); t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;
+  t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500);
+}
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click',()=>{ const item=q.closest('.faq-item'); const open=item.classList.contains('open'); document.querySelectorAll('.faq-item.open').forEach(el=>el.classList.remove('open')); if(!open)item.classList.add('open'); });
+});
 </script>
 </body>
 </html>
