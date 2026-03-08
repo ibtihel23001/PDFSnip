@@ -5,223 +5,385 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Compress SVG — Minify SVG Files Free | PDFSnip.com</title>
   <meta name="description" content="Minify and compress SVG files online. Remove unnecessary code, whitespace, and metadata. Free, instant, no signup." />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--surface:#1c1c28;--border:#2a2a3d;--accent:#4488ff;--text:#f0f0f5;--text2:#9999bb}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text);text-decoration:none}
+    .logo span{color:#ff5533}
+    .nav-btn{background:#ff5533;color:white;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 18px;border-radius:8px}
+    .page{max-width:860px;margin:0 auto;padding:100px 24px 80px}
+    .breadcrumb{font-size:0.8rem;color:var(--text2);margin-bottom:28px}
+    .breadcrumb a{color:var(--text2);text-decoration:none}
+    h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
+    .subtitle{color:var(--text2);font-size:1rem;margin-bottom:36px}
+    .drop-zone{border:2px dashed var(--border);border-radius:20px;padding:52px 32px;text-align:center;background:var(--bg3);cursor:pointer;transition:border-color 0.2s,background 0.2s}
+    .drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(68,136,255,0.04)}
+    .drop-icon{font-size:2.8rem;display:block;margin-bottom:14px}
+    .drop-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px}
+    .drop-sub{color:var(--text2);font-size:0.85rem;margin-bottom:20px}
+    .browse-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s}
+    .browse-btn:hover{opacity:0.88;transform:translateY(-1px)}
+    .file-list{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+    .file-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+    .file-row-name{flex:1;font-size:0.88rem;font-weight:500}
+    .file-row-size{font-size:0.76rem;color:var(--text2)}
+    .file-row-rm{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px}
+    .file-row-rm:hover{color:#ff5533}
+    .settings-box{margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .settings-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:18px}
+    .settings-row{display:flex;gap:16px;flex-wrap:wrap}
+    .setting{display:flex;flex-direction:column;gap:7px;flex:1;min-width:160px}
+    .setting label{font-size:0.78rem;color:var(--text2);font-weight:500}
+    select{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;appearance:none}
+    select:focus{outline:none;border-color:var(--accent)}
+    .checkbox-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+    .checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+    .checkbox-row label{font-size:0.84rem;color:var(--text2);cursor:pointer}
+    .convert-wrap{margin-top:20px;text-align:center}
+    .convert-btn{background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;padding:15px 44px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:10px}
+    .convert-btn:hover:not(:disabled){opacity:0.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(68,136,255,0.3)}
+    .convert-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+    .log-box{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+    .log-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.87rem}
+    .spinner{width:18px;height:18px;flex-shrink:0;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .results-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;margin-top:32px}
+    .results-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
+    .results-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .zip-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:all 0.2s}
+    .zip-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .zip-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .reset-btn{background:#ff5533;color:white;border:none;padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer}
+    .result-cards{display:flex;flex-direction:column;gap:12px}
+    .svg-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+    .svg-preview{width:80px;height:80px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+    .svg-preview svg{max-width:100%;max-height:100%}
+    .svg-info{flex:1;min-width:180px}
+    .svg-name{font-weight:600;font-size:0.9rem;margin-bottom:6px;word-break:break-all}
+    .svg-stats{display:flex;gap:16px;align-items:center;margin-bottom:10px}
+    .svg-saving{font-size:0.85rem;font-weight:700;color:#44dd88}
+    .svg-sizes{font-size:0.78rem;color:var(--text2)}
+    .svg-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .dl-btn{background:var(--accent);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+    .dl-btn:hover{opacity:0.85}
+    .dl-btn.done{background:#44dd88}
+    .preview-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;transition:all 0.2s}
+    .preview-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .code-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:monospace;font-size:0.75rem;color:var(--text2);max-height:120px;overflow:auto;margin-top:12px;word-break:break-all;display:none}
+    .faq-section{background:var(--bg2);border-top:1px solid var(--border);padding:72px 24px;margin-top:60px}
+    .faq-inner{max-width:720px;margin:0 auto}
+    .section-tag{font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:12px}
+    .section-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:36px}
+    .faq-list{display:flex;flex-direction:column;gap:10px}
+    .faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .faq-q{padding:18px 22px;font-weight:600;font-size:0.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;user-select:none}
+    .faq-q:hover{color:var(--accent)}
+    .faq-icon{transition:transform 0.3s;color:var(--text2);flex-shrink:0}
+    .faq-item.open .faq-icon{transform:rotate(45deg);color:var(--accent)}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s;color:var(--text2);font-size:0.88rem;line-height:1.7}
+    .faq-item.open .faq-a{max-height:300px;padding:0 22px 18px}
+    footer{background:var(--bg);border-top:1px solid var(--border);padding:48px 24px 28px}
+    .footer-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:36px}
+    .footer-logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+    .footer-logo span{color:#ff5533}
+    .footer-desc{font-size:0.84rem;color:var(--text2);margin-top:8px;max-width:240px;line-height:1.6}
+    .footer-col h4{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px}
+    .footer-links{list-style:none;display:flex;flex-direction:column;gap:9px}
+    .footer-links a{color:var(--text2);text-decoration:none;font-size:0.84rem}
+    .footer-links a:hover{color:#ff5533}
+    .footer-bottom{max-width:860px;margin:0 auto;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);flex-wrap:wrap;gap:8px}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:9px;font-size:0.88rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all 0.3s;transform:translateY(80px);opacity:0;pointer-events:none}
+    #toast.show{transform:translateY(0);opacity:1}
+  </style>
 </head>
 <body>
-
 <nav>
-  <a href="index.html" class="nav-logo">PDF<span>Snip</span></a>
-  <ul class="nav-links">
-    <li><a href="index.html#tools">All Tools</a></li>
-    <li><a href="index.html#how">How It Works</a></li>
-    <li><a href="index.html#faq">FAQ</a></li>
-    <li><a href="index.html" class="nav-cta">All Tools →</a></li>
-  </ul>
+  <a href="index.html" class="logo">PDF<span>Snip</span></a>
+  <a href="index.html" class="nav-btn">← All Tools</a>
 </nav>
 
-<div class="converter-page">
-  <div class="page-breadcrumb">
-    <a href="index.html">Home</a>
-    <span>›</span>
-    <span>Compress SVG</span>
-  </div>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › Compress SVG</div>
+  <h1>Compress SVG</h1>
+  <p class="subtitle">Minify SVG vector files by removing comments, whitespace, and unnecessary code. The visual output stays identical.</p>
 
-  <div class="page-hero">
-    <h1>✨ Compress SVG</h1>
-    <p>Minify SVG vector files by removing unnecessary code, comments, and metadata. Smaller SVGs load faster on the web.</p>
-  </div>
-
-  <div class="drop-zone" id="dropZone">
+  <div class="drop-zone" id="dz">
     <span class="drop-icon">✨</span>
-    <div class="drop-title">Drop your file here</div>
-    <div class="drop-sub">or click to browse · SVG files up to 10MB</div>
-    <button class="btn-primary" onclick="document.querySelector('.drop-input').click()">
-      📂 Choose File
-    </button>
-    <input type="file" class="drop-input" accept=".svg,image/svg+xml" multiple />
-    <div class="file-list"></div>
+    <div class="drop-title">Drop your SVG files here</div>
+    <div class="drop-sub">or click below · SVG files · Runs 100% in your browser</div>
+    <button class="browse-btn" type="button" id="browseBtn">📂 Choose SVG Files</button>
+    <input type="file" id="fileIn" accept=".svg,image/svg+xml" multiple style="display:none" />
+    <div class="file-list" id="fileList"></div>
   </div>
 
-  <div class="tool-options">
-    <div class="options-title">⚙️ Settings</div>
-    <div class="options-row">
-      <div class="option-group">
-        <label class="option-label">Minification Level</label>
-        <select class="option-select" id="level">
-          <option value="aggressive">Aggressive — Max Compression</option>
-          <option value="standard">Standard (Recommended)</option>
-          <option value="safe">Safe — Keep Structure</option>
-        </select>
+  <div class="settings-box">
+    <div class="settings-title">⚙️ Minification Options</div>
+    <div class="settings-row">
+      <div class="setting">
+        <label>Whitespace</label>
+        <div class="checkbox-row"><input type="checkbox" id="removeWhitespace" checked /><label for="removeWhitespace">Remove whitespace & line breaks</label></div>
       </div>
-      <div class="option-group">
-        <label class="option-label">Remove Comments</label>
-        <select class="option-select" id="comments">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+      <div class="setting">
+        <label>Comments</label>
+        <div class="checkbox-row"><input type="checkbox" id="removeComments" checked /><label for="removeComments">Remove XML comments</label></div>
       </div>
-      <div class="option-group">
-        <label class="option-label">Precision</label>
-        <select class="option-select" id="precision">
-          <option value="2">2 decimal places</option>
-          <option value="3">3 decimal places</option>
-          <option value="4">4 decimal places</option>
-        </select>
+      <div class="setting">
+        <label>Metadata</label>
+        <div class="checkbox-row"><input type="checkbox" id="removeMetadata" checked /><label for="removeMetadata">Remove &lt;metadata&gt; tags</label></div>
       </div>
-
-    </div>
-  </div>
-
-  <div class="convert-btn-wrap">
-    <button class="btn-convert" onclick="startConvert()" disabled style="background:var(--card-accent,var(--accent))">
-      ✨ Minify SVG
-    </button>
-    <div class="progress-bar-wrap">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.8rem;color:var(--text2)">
-        <span>Processing...</span>
-        <span id="progressPct">0%</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="background:var(--card-accent,var(--accent))"></div>
+      <div class="setting">
+        <label>Editor data</label>
+        <div class="checkbox-row"><input type="checkbox" id="removeEditor" checked /><label for="removeEditor">Remove Inkscape/Illustrator data</label></div>
       </div>
     </div>
   </div>
 
-  <div class="results-section" id="results">
+  <div class="convert-wrap">
+    <button class="convert-btn" id="convertBtn" disabled onclick="runMinify()">✨ Minify SVGs</button>
+  </div>
+  <div class="log-box" id="logBox"></div>
+
+  <div id="resultsWrap" style="display:none">
     <div class="results-header">
-      <div class="results-title">✅ Your File Is Ready</div>
-      <button class="btn-primary" onclick="downloadAll()" style="font-size:0.88rem;padding:10px 20px;">
-        📦 Download All
-      </button>
+      <div class="results-title">✅ SVGs Minified!</div>
+      <div class="results-actions">
+        <button class="zip-btn" id="zipBtn" onclick="doZip()">📦 Download All as ZIP</button>
+        <button class="reset-btn" onclick="doReset()">🔄 Minify More</button>
+      </div>
     </div>
-    <div class="results-grid">
-      <div class="result-card">
-        <div style="padding:28px;text-align:center">
-          <div style="font-size:3rem;margin-bottom:12px">✨</div>
-          <div style="font-size:0.9rem;font-weight:600;margin-bottom:6px">output_file.svg</div>
-          <div style="font-size:0.78rem;color:var(--text2)">Ready to download</div>
-        </div>
-        <div class="result-card-bottom">
-          <span class="result-name">Processed successfully</span>
-          <button class="btn-dl" onclick="showToast('✅','Download started!')">↓ Save</button>
-        </div>
+    <div class="result-cards" id="resultCards"></div>
+  </div>
+</div>
+
+<div class="faq-section">
+  <div class="faq-inner">
+    <span class="section-tag">FAQ</span>
+    <h2 class="section-title">Common Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">What does SVG minification do? <span class="faq-icon">+</span></div>
+        <div class="faq-a">SVG files are XML text. Minification removes whitespace, comments, metadata, and editor-specific data that design tools add. The visual output is identical — only file size changes.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will my SVG still work after minification? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. The minified SVG renders exactly the same in browsers, design tools, and code. It's just more compact.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How much compression can I expect? <span class="faq-icon">+</span></div>
+        <div class="faq-a">SVGs exported from Figma, Illustrator, or Inkscape can be 30–70% larger than they need to be due to editor metadata and formatting. Minification typically saves 20–60%.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my SVG code uploaded anywhere? <span class="faq-icon">+</span></div>
+        <div class="faq-a">No. All processing is done in your browser using JavaScript. Your SVG files never leave your device.</div>
       </div>
     </div>
   </div>
 </div>
 
-<section class="faq-section" id="faq">
-  <div class="faq-inner">
-    <div class="section-header">
-      <div class="section-tag">FAQ</div>
-      <h2 class="section-title">Compress SVG — Common Questions</h2>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <div class="faq-q">What does SVG compression actually do? <span class="faq-icon">+</span></div>
-        <div class="faq-a">SVG files are XML text. Our compressor removes whitespace, comments, metadata, and unused elements. It also simplifies path data and rounds floating-point numbers. The visual output is identical.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Will my SVG still work after compression? <span class="faq-icon">+</span></div>
-        <div class="faq-a">Yes. We use conservative defaults that maintain full SVG compatibility. Compressed SVGs work in all browsers, design tools, and icon systems.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">How much smaller will my SVG get? <span class="faq-icon">+</span></div>
-        <div class="faq-a">Typical SVG exports from tools like Adobe Illustrator or Figma include a lot of unnecessary data. Compression usually achieves 30–70% size reduction.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Can I compress SVG files for use in code? <span class="faq-icon">+</span></div>
-        <div class="faq-a">Absolutely. Our compressor is designed for web developers — the output SVGs are clean, inline-ready, and work perfectly as img src, CSS backgrounds, or inline SVG in HTML.</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section style="padding:60px 40px;background:var(--bg2);border-top:1px solid var(--border)">
-  <div style="max-width:1100px;margin:0 auto">
-    <div class="section-tag">Related Tools</div>
-    <h2 class="section-title" style="margin:12px 0 32px">You Might Also Need</h2>
-    <div style="display:flex;gap:16px;flex-wrap:wrap">
-      <a href="compress-png.html" class="btn-secondary" style="text-decoration:none">Compress PNG →</a>
-      <a href="compress-jpg.html" class="btn-secondary" style="text-decoration:none">Compress JPG →</a>
-      <a href="resize-image.html" class="btn-secondary" style="text-decoration:none">Resize Image →</a>
-
-    </div>
-  </div>
-</section>
-
 <footer>
   <div class="footer-inner">
-    <div class="footer-brand">
-      <div class="nav-logo">PDF<span style="color:var(--accent)">Snip</span></div>
-      <p>Free, fast, and private PDF and image tools for everyone. No watermarks, no limits.</p>
-    </div>
-    <div>
-      <div class="footer-col-title">PDF Tools</div>
-      <ul class="footer-links">
-        <li><a href="pdf-to-jpg.html">PDF to JPG</a></li>
-        <li><a href="compress-pdf.html">Compress PDF</a></li>
-        <li><a href="merge-pdf.html">Merge PDF</a></li>
-        <li><a href="split-pdf.html">Split PDF</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Image Tools</div>
-      <ul class="footer-links">
-        <li><a href="compress-jpg.html">Compress JPG</a></li>
-        <li><a href="compress-png.html">Compress PNG</a></li>
-        <li><a href="compress-svg.html">Compress SVG</a></li>
-        <li><a href="jpg-to-png.html">JPG to PNG</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links">
-        <li><a href="#">About</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </div>
+    <div><div class="footer-logo">PDF<span>Snip</span></div><div class="footer-desc">Free, fast, private PDF & image tools. No watermarks, no limits.</div></div>
+    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links"><li><a href="pdf-to-jpg.html">PDF to JPG</a></li><li><a href="compress-pdf.html">Compress PDF</a></li></ul></div>
+    <div class="footer-col"><h4>Image Tools</h4><ul class="footer-links"><li><a href="compress-jpg.html">Compress JPG</a></li><li><a href="compress-png.html">Compress PNG</a></li><li><a href="compress-svg.html">Compress SVG</a></li></ul></div>
   </div>
-  <div class="footer-bottom">
-    <span>© 2025 PDFSnip.com — All rights reserved.</span>
-    <span>Made with ❤️ for the web</span>
-  </div>
+  <div class="footer-bottom"><span>© 2025 PDFSnip.com</span><span>Made with ❤️</span></div>
 </footer>
+<div id="toast"></div>
 
-<style>:root { --card-accent: #4488ff; }</style>
-<script src="js/main.js"></script>
 <script>
-window.startConvert = function() {
-  const btn = document.querySelector('.btn-convert');
-  const progress = document.querySelector('.progress-bar-wrap');
-  const fill = document.getElementById('progressFill');
-  const pct = document.getElementById('progressPct');
-  const results = document.querySelector('.results-section');
-  if (!selectedFiles.length) return;
-  btn.disabled = true;
-  btn.innerHTML = '⚙️ Processing...';
-  progress.classList.add('show');
-  let p = 0;
-  const iv = setInterval(() => {
-    p += Math.random() * 16;
-    if (p >= 100) {
-      p = 100; clearInterval(iv);
-      fill.style.width = '100%'; pct.textContent = '100%';
-      setTimeout(() => {
-        btn.innerHTML = '🔄 Process More';
-        btn.disabled = false;
-        results.classList.add('show');
-        showToast('✅', 'Done! Your file is ready to download.');
-      }, 400);
+let files=[], results=[];
+
+document.getElementById('browseBtn').addEventListener('click',()=>document.getElementById('fileIn').click());
+document.getElementById('fileIn').addEventListener('change',e=>{addFiles([...e.target.files]);e.target.value='';});
+const dz=document.getElementById('dz');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');addFiles([...e.dataTransfer.files]);});
+
+function addFiles(incoming) {
+  const svgs=incoming.filter(f=>f.type==='image/svg+xml'||f.name.toLowerCase().endsWith('.svg'));
+  if(!svgs.length){toast('⚠️','Please select SVG files only');return;}
+  files=[...files,...svgs]; renderList();
+}
+function renderList(){
+  const list=document.getElementById('fileList'); list.innerHTML='';
+  files.forEach((f,i)=>{
+    const d=document.createElement('div'); d.className='file-row';
+    d.innerHTML=`<span>✨</span><span class="file-row-name">${f.name}</span><span class="file-row-size">${fmt(f.size)}</span><button class="file-row-rm" onclick="removeFile(${i})">✕</button>`;
+    list.appendChild(d);
+  });
+  document.getElementById('convertBtn').disabled=files.length===0;
+}
+function removeFile(i){files.splice(i,1);renderList();}
+function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+
+async function runMinify() {
+  if(!files.length)return;
+  const btn=document.getElementById('convertBtn');
+  btn.disabled=true; btn.textContent='⚙️ Minifying…';
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('resultsWrap').style.display='none';
+  document.getElementById('resultCards').innerHTML='';
+  results=[];
+
+  const removeWhitespace=document.getElementById('removeWhitespace').checked;
+  const removeComments=document.getElementById('removeComments').checked;
+  const removeMetadata=document.getElementById('removeMetadata').checked;
+  const removeEditor=document.getElementById('removeEditor').checked;
+
+  for(const file of files) {
+    const row=addLogRow(`Minifying ${file.name}…`);
+    try {
+      const text=await file.text();
+      const minified=minifySVG(text,{removeWhitespace,removeComments,removeMetadata,removeEditor});
+      const blob=new Blob([minified],{type:'image/svg+xml'});
+      const name=file.name.replace(/\.svg$/i,'')+'_minified.svg';
+      const url=URL.createObjectURL(blob);
+      results.push({name,blob,url,origSize:file.size,newSize:blob.size,svgText:minified});
+      const saving=Math.round((1-blob.size/file.size)*100);
+      addCard(file.name,name,url,results.length-1,file.size,blob.size,saving,minified);
+      markRowDone(row,`<strong>${file.name}</strong> — ${fmt(file.size)} → ${fmt(blob.size)} <span style="color:#44dd88">(${saving>0?saving+'% smaller':'no change'})</span>`);
+    } catch(e) {
+      markRowError(row,`Failed: ${file.name} — ${e.message}`);
     }
-    fill.style.width = p + '%';
-    pct.textContent = Math.round(p) + '%';
-  }, 150);
-};
+  }
+
+  document.getElementById('resultsWrap').style.display='block';
+  btn.textContent='✨ Minify SVGs'; btn.disabled=false;
+  toast('✅',`${results.length} SVG${results.length>1?'s':''} minified!`);
+  document.getElementById('resultsWrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function minifySVG(svgText, opts) {
+  let result = svgText;
+
+  // Remove XML comments <!-- ... -->
+  if(opts.removeComments) {
+    result = result.replace(/<!--[\s\S]*?-->/g, '');
+  }
+
+  // Remove <metadata>...</metadata> blocks
+  if(opts.removeMetadata) {
+    result = result.replace(/<metadata[\s\S]*?<\/metadata>/gi, '');
+  }
+
+  // Remove Inkscape / Illustrator / Sodipodi namespaced attributes and elements
+  if(opts.removeEditor) {
+    result = result.replace(/<sodipodi:[^>]*\/>/gi, '');
+    result = result.replace(/<sodipodi:[\s\S]*?<\/sodipodi:[^>]*>/gi, '');
+    result = result.replace(/<inkscape:[^>]*\/>/gi, '');
+    result = result.replace(/\s+inkscape:[a-z-]+="[^"]*"/gi, '');
+    result = result.replace(/\s+sodipodi:[a-z-]+="[^"]*"/gi, '');
+    result = result.replace(/xmlns:inkscape="[^"]*"/gi, '');
+    result = result.replace(/xmlns:sodipodi="[^"]*"/gi, '');
+    result = result.replace(/xmlns:dc="[^"]*"/gi, '');
+    result = result.replace(/xmlns:cc="[^"]*"/gi, '');
+    result = result.replace(/xmlns:rdf="[^"]*"/gi, '');
+    // Remove Illustrator XML processing instructions
+    result = result.replace(/<\?[^>]*\?>/g, '');
+  }
+
+  // Remove whitespace between tags and collapse internal whitespace
+  if(opts.removeWhitespace) {
+    // Remove newlines and tabs
+    result = result.replace(/[\r\n\t]+/g, ' ');
+    // Collapse multiple spaces
+    result = result.replace(/  +/g, ' ');
+    // Remove spaces between tags
+    result = result.replace(/> </g, '><');
+    // Remove leading/trailing spaces in attribute values (careful)
+    result = result.replace(/\s+\/>/g, '/>');
+    result = result.trim();
+  }
+
+  return result;
+}
+
+function addCard(origName, name, url, idx, origSize, newSize, saving, svgText) {
+  const cards=document.getElementById('resultCards');
+  const card=document.createElement('div'); card.className='svg-card';
+
+  // SVG preview
+  const preview=document.createElement('div'); preview.className='svg-preview';
+  try {
+    const blob=new Blob([svgText],{type:'image/svg+xml'});
+    const purl=URL.createObjectURL(blob);
+    const img=document.createElement('img');
+    img.src=purl; img.style.maxWidth='100%'; img.style.maxHeight='100%';
+    preview.appendChild(img);
+  } catch(e){ preview.textContent='SVG'; }
+
+  const info=document.createElement('div'); info.className='svg-info';
+  info.innerHTML=`
+    <div class="svg-name">${name}</div>
+    <div class="svg-stats">
+      <span class="svg-sizes">${fmt(origSize)} → ${fmt(newSize)}</span>
+      <span class="svg-saving">${saving>0?'-'+saving+'%':'no change'}</span>
+    </div>`;
+
+  const actions=document.createElement('div'); actions.className='svg-actions';
+
+  const dlBtn=document.createElement('button'); dlBtn.className='dl-btn'; dlBtn.textContent='↓ Download SVG';
+  dlBtn.addEventListener('click',()=>{
+    triggerDownload(results[idx].url,results[idx].name);
+    dlBtn.textContent='✓ Saved'; dlBtn.classList.add('done');
+    setTimeout(()=>{dlBtn.textContent='↓ Download SVG';dlBtn.classList.remove('done');},2500);
+  });
+
+  const codeBtn=document.createElement('button'); codeBtn.className='preview-btn'; codeBtn.textContent='</> View Code';
+  const codeBlock=document.createElement('div'); codeBlock.className='code-block'; codeBlock.textContent=svgText.substring(0,500)+(svgText.length>500?'…':'');
+  codeBtn.addEventListener('click',()=>{
+    const showing=codeBlock.style.display==='block';
+    codeBlock.style.display=showing?'none':'block';
+    codeBtn.textContent=showing?'</> View Code':'✕ Hide Code';
+  });
+
+  actions.appendChild(dlBtn); actions.appendChild(codeBtn);
+  info.appendChild(actions); info.appendChild(codeBlock);
+  card.appendChild(preview); card.appendChild(info);
+  cards.appendChild(card);
+}
+
+function triggerDownload(url,filename){
+  const a=document.createElement('a'); a.href=url; a.download=filename; a.style.display='none';
+  document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
+}
+
+async function doZip(){
+  if(!results.length)return;
+  const btn=document.getElementById('zipBtn'); btn.disabled=true; btn.textContent='⏳ Building ZIP…';
+  try {
+    const zip=new JSZip();
+    results.forEach(({name,blob})=>zip.file(name,blob));
+    const zipBlob=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+    triggerDownload(URL.createObjectURL(zipBlob),'PDFSnip_minified_svg.zip');
+    toast('📦','ZIP downloaded!');
+  } catch(e){toast('❌','ZIP error: '+e.message);}
+  btn.disabled=false; btn.textContent='📦 Download All as ZIP';
+}
+
+function doReset(){
+  results.forEach(r=>URL.revokeObjectURL(r.url)); results=[]; files=[];
+  document.getElementById('fileList').innerHTML='';
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('resultsWrap').style.display='none';
+  document.getElementById('resultCards').innerHTML='';
+  document.getElementById('convertBtn').disabled=true;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function addLogRow(text){const box=document.getElementById('logBox');const row=document.createElement('div');row.className='log-row';row.innerHTML=`<div class="spinner"></div><span>${text}</span>`;box.appendChild(row);return row;}
+function setRowText(row,html){row.querySelector('span').innerHTML=html;}
+function markRowDone(row,html){row.querySelector('.spinner').outerHTML='<span>✅</span>';setRowText(row,html);}
+function markRowError(row,html){row.querySelector('.spinner').outerHTML='<span>❌</span>';setRowText(row,`<span style="color:#ff8866">${html}</span>`);}
+function toast(icon,msg){const t=document.getElementById('toast');t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+document.querySelectorAll('.faq-q').forEach(q=>{q.addEventListener('click',()=>{const item=q.closest('.faq-item');const open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(el=>el.classList.remove('open'));if(!open)item.classList.add('open');});});
 </script>
 </body>
 </html>
