@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Compress SVG — Minify SVG Files Free | PDFSnip.com</title>
-  <meta name="description" content="Minify and compress SVG files online. Remove unnecessary code, whitespace, and metadata. Free, instant, no signup." />
+  <meta name="description" content="Minify and compress SVG files online using SVGO. Remove unnecessary code, whitespace, and metadata. Free, instant, no signup." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- SVGO browser build — the industry standard SVG optimizer -->
+  <script src="https://unpkg.com/svgo@3.2.0/dist/svgo.browser.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--surface:#1c1c28;--border:#2a2a3d;--accent:#4488ff;--text:#f0f0f5;--text2:#9999bb}
@@ -16,93 +18,113 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
     .logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text);text-decoration:none}
     .logo span{color:#ff5533}
-    .nav-btn{background:#ff5533;color:white;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 18px;border-radius:8px}
+    .nav-btn{background:#ff5533;color:white;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 18px;border-radius:8px;transition:background .2s}
+    .nav-btn:hover{background:#e04422}
     .page{max-width:860px;margin:0 auto;padding:100px 24px 80px}
     .breadcrumb{font-size:0.8rem;color:var(--text2);margin-bottom:28px}
     .breadcrumb a{color:var(--text2);text-decoration:none}
     h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
-    .subtitle{color:var(--text2);font-size:1rem;margin-bottom:36px}
-    .drop-zone{border:2px dashed var(--border);border-radius:20px;padding:52px 32px;text-align:center;background:var(--bg3);cursor:pointer;transition:border-color 0.2s,background 0.2s}
+    .subtitle{color:var(--text2);font-size:1rem;margin-bottom:24px}
+    .svgo-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.3);border-radius:8px;padding:8px 14px;font-size:0.82rem;color:var(--accent);margin-bottom:28px}
+
+    .drop-zone{border:2px dashed var(--border);border-radius:20px;padding:52px 32px;text-align:center;background:var(--bg3);cursor:pointer;transition:border-color .2s,background .2s}
     .drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(68,136,255,0.04)}
     .drop-icon{font-size:2.8rem;display:block;margin-bottom:14px}
     .drop-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px}
     .drop-sub{color:var(--text2);font-size:0.85rem;margin-bottom:20px}
-    .browse-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s}
-    .browse-btn:hover{opacity:0.88;transform:translateY(-1px)}
+    .browse-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .browse-btn:hover{opacity:.88;transform:translateY(-1px)}
     .file-list{margin-top:20px;display:flex;flex-direction:column;gap:8px}
     .file-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
-    .file-row-name{flex:1;font-size:0.88rem;font-weight:500}
-    .file-row-size{font-size:0.76rem;color:var(--text2)}
-    .file-row-rm{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px}
+    .file-row-name{flex:1;font-size:0.88rem;font-weight:500;word-break:break-all}
+    .file-row-size{font-size:0.76rem;color:var(--text2);white-space:nowrap}
+    .file-row-rm{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px;flex-shrink:0}
     .file-row-rm:hover{color:#ff5533}
+
+    /* settings */
     .settings-box{margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px}
-    .settings-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:18px}
-    .settings-row{display:flex;gap:16px;flex-wrap:wrap}
-    .setting{display:flex;flex-direction:column;gap:7px;flex:1;min-width:160px}
-    .setting label{font-size:0.78rem;color:var(--text2);font-weight:500}
-    select{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;appearance:none}
+    .settings-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:16px}
+    .checks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+    .check-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;transition:border-color .2s}
+    .check-row:hover{border-color:var(--accent)}
+    .check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;margin-top:2px;flex-shrink:0}
+    .check-label{font-size:0.82rem;line-height:1.4}
+    .check-label strong{display:block;color:var(--text);font-size:0.84rem;margin-bottom:1px}
+    .check-label span{color:var(--text2)}
+
+    .precision-row{margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .precision-row label{font-size:0.8rem;color:var(--text2)}
+    select{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;appearance:none}
     select:focus{outline:none;border-color:var(--accent)}
-    .checkbox-row{display:flex;align-items:center;gap:8px;margin-top:4px}
-    .checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
-    .checkbox-row label{font-size:0.84rem;color:var(--text2);cursor:pointer}
+
     .convert-wrap{margin-top:20px;text-align:center}
-    .convert-btn{background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;padding:15px 44px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:10px}
-    .convert-btn:hover:not(:disabled){opacity:0.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(68,136,255,0.3)}
-    .convert-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+    .convert-btn{background:var(--accent);color:white;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;padding:15px 44px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:10px}
+    .convert-btn:hover:not(:disabled){opacity:.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(68,136,255,.3)}
+    .convert-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+    /* log */
     .log-box{margin-top:20px;display:flex;flex-direction:column;gap:8px}
     .log-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.87rem}
-    .spinner{width:18px;height:18px;flex-shrink:0;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+    .spinner{width:18px;height:18px;flex-shrink:0;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* results */
     .results-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;margin-top:32px}
     .results-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
     .results-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .zip-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer;transition:all 0.2s}
+    .zip-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px 20px;border-radius:9px;font-size:.87rem;font-weight:600;cursor:pointer;transition:all .2s}
     .zip-btn:hover{border-color:var(--accent);color:var(--accent)}
-    .zip-btn:disabled{opacity:0.5;cursor:not-allowed}
-    .reset-btn{background:#ff5533;color:white;border:none;padding:9px 20px;border-radius:9px;font-size:0.87rem;font-weight:600;cursor:pointer}
-    .result-cards{display:flex;flex-direction:column;gap:12px}
-    .svg-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-    .svg-preview{width:80px;height:80px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
-    .svg-preview svg{max-width:100%;max-height:100%}
-    .svg-info{flex:1;min-width:180px}
-    .svg-name{font-weight:600;font-size:0.9rem;margin-bottom:6px;word-break:break-all}
-    .svg-stats{display:flex;gap:16px;align-items:center;margin-bottom:10px}
-    .svg-saving{font-size:0.85rem;font-weight:700;color:#44dd88}
-    .svg-sizes{font-size:0.78rem;color:var(--text2)}
+    .zip-btn:disabled{opacity:.5;cursor:not-allowed}
+    .reset-btn{background:#ff5533;color:white;border:none;padding:9px 20px;border-radius:9px;font-size:.87rem;font-weight:600;cursor:pointer;transition:background .2s}
+    .reset-btn:hover{background:#e04422}
+    .result-cards{display:flex;flex-direction:column;gap:14px}
+    .svg-card{background:var(--bg3);border:1px solid #44dd88;border-radius:14px;padding:20px 22px}
+    .svg-card-top{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+    .svg-preview-box{width:72px;height:72px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid #eee}
+    .svg-preview-box img{max-width:100%;max-height:100%;object-fit:contain}
+    .svg-info{flex:1;min-width:160px}
+    .svg-name{font-weight:700;font-size:0.9rem;word-break:break-all;margin-bottom:4px}
+    .svg-meta{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+    .svg-saving{font-size:1rem;font-weight:800}
+    .svg-bar-outer{background:var(--border);border-radius:4px;height:6px;overflow:hidden;margin-bottom:14px}
+    .svg-bar-inner{height:100%;background:linear-gradient(90deg,#44dd88,#4488ff);border-radius:4px;transition:width .6s ease}
     .svg-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .dl-btn{background:var(--accent);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
-    .dl-btn:hover{opacity:0.85}
+    .dl-btn{background:var(--accent);color:white;border:none;padding:9px 20px;border-radius:9px;font-size:.85rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+    .dl-btn:hover{opacity:.85}
     .dl-btn.done{background:#44dd88}
-    .preview-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;transition:all 0.2s}
-    .preview-btn:hover{border-color:var(--accent);color:var(--accent)}
-    .code-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:monospace;font-size:0.75rem;color:var(--text2);max-height:120px;overflow:auto;margin-top:12px;word-break:break-all;display:none}
+    .code-toggle-btn{background:var(--surface);color:var(--text2);border:1px solid var(--border);padding:9px 16px;border-radius:9px;font-size:.82rem;cursor:pointer;transition:all .2s}
+    .code-toggle-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .code-block{display:none;margin-top:12px;background:#0d0d14;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:monospace;font-size:.72rem;color:#aaa;max-height:140px;overflow:auto;word-break:break-all;line-height:1.5}
+
+    /* faq + footer */
     .faq-section{background:var(--bg2);border-top:1px solid var(--border);padding:72px 24px;margin-top:60px}
     .faq-inner{max-width:720px;margin:0 auto}
-    .section-tag{font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:12px}
-    .section-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:36px}
+    .section-tag{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:12px}
+    .section-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.02em;margin-bottom:36px}
     .faq-list{display:flex;flex-direction:column;gap:10px}
     .faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .faq-q{padding:18px 22px;font-weight:600;font-size:0.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;user-select:none}
+    .faq-q{padding:18px 22px;font-weight:600;font-size:.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;user-select:none;transition:color .2s}
     .faq-q:hover{color:var(--accent)}
-    .faq-icon{transition:transform 0.3s;color:var(--text2);flex-shrink:0}
+    .faq-icon{transition:transform .3s;color:var(--text2);flex-shrink:0}
     .faq-item.open .faq-icon{transform:rotate(45deg);color:var(--accent)}
-    .faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s;color:var(--text2);font-size:0.88rem;line-height:1.7}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s;color:var(--text2);font-size:.88rem;line-height:1.7}
     .faq-item.open .faq-a{max-height:300px;padding:0 22px 18px}
     footer{background:var(--bg);border-top:1px solid var(--border);padding:48px 24px 28px}
     .footer-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:36px}
     .footer-logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
     .footer-logo span{color:#ff5533}
-    .footer-desc{font-size:0.84rem;color:var(--text2);margin-top:8px;max-width:240px;line-height:1.6}
-    .footer-col h4{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px}
+    .footer-desc{font-size:.84rem;color:var(--text2);margin-top:8px;max-width:240px;line-height:1.6}
+    .footer-col h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:14px}
     .footer-links{list-style:none;display:flex;flex-direction:column;gap:9px}
-    .footer-links a{color:var(--text2);text-decoration:none;font-size:0.84rem}
+    .footer-links a{color:var(--text2);text-decoration:none;font-size:.84rem;transition:color .2s}
     .footer-links a:hover{color:#ff5533}
-    .footer-bottom{max-width:860px;margin:0 auto;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);flex-wrap:wrap;gap:8px}
-    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:9px;font-size:0.88rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all 0.3s;transform:translateY(80px);opacity:0;pointer-events:none}
+    .footer-bottom{max-width:860px;margin:0 auto;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;font-size:.78rem;color:var(--text2);flex-wrap:wrap;gap:8px}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:9px;font-size:.88rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all .3s;transform:translateY(80px);opacity:0;pointer-events:none}
     #toast.show{transform:translateY(0);opacity:1}
   </style>
 </head>
 <body>
+
 <nav>
   <a href="index.html" class="logo">PDF<span>Snip</span></a>
   <a href="index.html" class="nav-btn">← All Tools</a>
@@ -111,44 +133,110 @@
 <div class="page">
   <div class="breadcrumb"><a href="index.html">Home</a> › Compress SVG</div>
   <h1>Compress SVG</h1>
-  <p class="subtitle">Minify SVG vector files by removing comments, whitespace, and unnecessary code. The visual output stays identical.</p>
+  <p class="subtitle">Powered by SVGO — the industry-standard SVG optimizer. Achieves 20–70% reduction by removing unused code, attributes, and redundant data.</p>
+  <div class="svgo-badge">⚡ Powered by SVGO 3 — same tool used by Webpack, Vite & major design systems</div>
 
+  <!-- DROP ZONE -->
   <div class="drop-zone" id="dz">
     <span class="drop-icon">✨</span>
     <div class="drop-title">Drop your SVG files here</div>
-    <div class="drop-sub">or click below · SVG files · Runs 100% in your browser</div>
+    <div class="drop-sub">or click below · SVG files · Runs 100% in your browser · No upload</div>
     <button class="browse-btn" type="button" id="browseBtn">📂 Choose SVG Files</button>
     <input type="file" id="fileIn" accept=".svg,image/svg+xml" multiple style="display:none" />
     <div class="file-list" id="fileList"></div>
   </div>
 
+  <!-- SETTINGS -->
   <div class="settings-box">
-    <div class="settings-title">⚙️ Minification Options</div>
-    <div class="settings-row">
-      <div class="setting">
-        <label>Whitespace</label>
-        <div class="checkbox-row"><input type="checkbox" id="removeWhitespace" checked /><label for="removeWhitespace">Remove whitespace & line breaks</label></div>
-      </div>
-      <div class="setting">
-        <label>Comments</label>
-        <div class="checkbox-row"><input type="checkbox" id="removeComments" checked /><label for="removeComments">Remove XML comments</label></div>
-      </div>
-      <div class="setting">
-        <label>Metadata</label>
-        <div class="checkbox-row"><input type="checkbox" id="removeMetadata" checked /><label for="removeMetadata">Remove &lt;metadata&gt; tags</label></div>
-      </div>
-      <div class="setting">
-        <label>Editor data</label>
-        <div class="checkbox-row"><input type="checkbox" id="removeEditor" checked /><label for="removeEditor">Remove Inkscape/Illustrator data</label></div>
-      </div>
+    <div class="settings-title">⚙️ SVGO Optimization Plugins</div>
+    <div class="checks-grid">
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeComments" checked />
+        <div class="check-label"><strong>Remove Comments</strong><span>Strips XML & CSS comments</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeMetadata" checked />
+        <div class="check-label"><strong>Remove Metadata</strong><span>Strips &lt;metadata&gt; blocks</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeDoctype" checked />
+        <div class="check-label"><strong>Remove DOCTYPE</strong><span>Removes DOCTYPE declaration</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeXMLProcInst" checked />
+        <div class="check-label"><strong>Remove XML Declaration</strong><span>Removes &lt;?xml ...?&gt;</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeEditorsNSData" checked />
+        <div class="check-label"><strong>Remove Editor Data</strong><span>Inkscape, Illustrator, Sketch namespaces</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeEmptyAttrs" checked />
+        <div class="check-label"><strong>Remove Empty Attrs</strong><span>Strips attributes with empty values</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeEmptyContainers" checked />
+        <div class="check-label"><strong>Remove Empty Containers</strong><span>Strips empty &lt;g&gt;, &lt;defs&gt; etc.</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeUnusedNS" checked />
+        <div class="check-label"><strong>Remove Unused Namespaces</strong><span>Cleans up xmlns declarations</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_removeHiddenElems" checked />
+        <div class="check-label"><strong>Remove Hidden Elements</strong><span>Strips invisible elements</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_collapseGroups" checked />
+        <div class="check-label"><strong>Collapse Groups</strong><span>Merges redundant &lt;g&gt; elements</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_mergePaths" checked />
+        <div class="check-label"><strong>Merge Paths</strong><span>Combines separate paths where possible</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_convertColors" checked />
+        <div class="check-label"><strong>Minify Colors</strong><span>rgb(255,0,0) → #f00</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_cleanupIds" checked />
+        <div class="check-label"><strong>Minify IDs</strong><span>Shorten long ID names</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_minifyStyles" checked />
+        <div class="check-label"><strong>Minify Styles</strong><span>Compress embedded CSS</span></div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="opt_sortAttrs" />
+        <div class="check-label"><strong>Sort Attributes</strong><span>Better gzip compression (slower)</span></div>
+      </label>
+    </div>
+
+    <div class="precision-row">
+      <label>Float precision:</label>
+      <select id="floatPrecision">
+        <option value="1">1 decimal (most compact)</option>
+        <option value="2" selected>2 decimals (recommended)</option>
+        <option value="3">3 decimals (more accurate)</option>
+        <option value="4">4 decimals (highest accuracy)</option>
+      </select>
+      <label style="margin-left:8px">Transform precision:</label>
+      <select id="transformPrecision">
+        <option value="2">2 decimals</option>
+        <option value="3" selected>3 decimals</option>
+        <option value="4">4 decimals</option>
+      </select>
     </div>
   </div>
 
+  <!-- BUTTON -->
   <div class="convert-wrap">
     <button class="convert-btn" id="convertBtn" disabled onclick="runMinify()">✨ Minify SVGs</button>
   </div>
+
   <div class="log-box" id="logBox"></div>
 
+  <!-- RESULTS -->
   <div id="resultsWrap" style="display:none">
     <div class="results-header">
       <div class="results-title">✅ SVGs Minified!</div>
@@ -161,26 +249,31 @@
   </div>
 </div>
 
+<!-- FAQ -->
 <div class="faq-section">
   <div class="faq-inner">
     <span class="section-tag">FAQ</span>
     <h2 class="section-title">Common Questions</h2>
     <div class="faq-list">
       <div class="faq-item">
-        <div class="faq-q">What does SVG minification do? <span class="faq-icon">+</span></div>
-        <div class="faq-a">SVG files are XML text. Minification removes whitespace, comments, metadata, and editor-specific data that design tools add. The visual output is identical — only file size changes.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Will my SVG still work after minification? <span class="faq-icon">+</span></div>
-        <div class="faq-a">Yes. The minified SVG renders exactly the same in browsers, design tools, and code. It's just more compact.</div>
+        <div class="faq-q">What is SVGO? <span class="faq-icon">+</span></div>
+        <div class="faq-a">SVGO (SVG Optimizer) is the industry-standard open-source tool for SVG optimization. It's used by Webpack, Vite, Create React App, and hundreds of major projects. Unlike simple regex replacement, SVGO parses the full SVG structure and applies intelligent optimizations.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">How much compression can I expect? <span class="faq-icon">+</span></div>
-        <div class="faq-a">SVGs exported from Figma, Illustrator, or Inkscape can be 30–70% larger than they need to be due to editor metadata and formatting. Minification typically saves 20–60%.</div>
+        <div class="faq-a">SVGs exported from Figma, Illustrator, or Inkscape typically contain 30–60% unnecessary data. SVGO commonly achieves 20–60% reduction. Simple icons may see 50%+ savings. Complex illustrations with many paths may see 10–30%.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is my SVG code uploaded anywhere? <span class="faq-icon">+</span></div>
-        <div class="faq-a">No. All processing is done in your browser using JavaScript. Your SVG files never leave your device.</div>
+        <div class="faq-q">Will the SVG still look the same? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. All optimizations are visually lossless by default. SVGO only removes redundant code and simplifies values — the rendered output is identical. You can always use "View Code" to inspect the result before downloading.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my SVG uploaded to a server? <span class="faq-icon">+</span></div>
+        <div class="faq-a">No. SVGO runs entirely in your browser as a JavaScript library. Your SVG files never leave your device.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Which plugins should I disable? <span class="faq-icon">+</span></div>
+        <div class="faq-a">If your SVG uses JavaScript that references element IDs, disable "Minify IDs". If you're animating specific elements with CSS class names, be cautious with "Remove Hidden Elements". For most static SVGs, leaving all options checked gives the best results.</div>
       </div>
     </div>
   </div>
@@ -189,201 +282,263 @@
 <footer>
   <div class="footer-inner">
     <div><div class="footer-logo">PDF<span>Snip</span></div><div class="footer-desc">Free, fast, private PDF & image tools. No watermarks, no limits.</div></div>
-    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links"><li><a href="pdf-to-jpg.html">PDF to JPG</a></li><li><a href="compress-pdf.html">Compress PDF</a></li></ul></div>
+    <div class="footer-col"><h4>PDF Tools</h4><ul class="footer-links"><li><a href="pdf-to-jpg.html">PDF to JPG</a></li><li><a href="compress-pdf.html">Compress PDF</a></li><li><a href="merge-pdf.html">Merge PDF</a></li></ul></div>
     <div class="footer-col"><h4>Image Tools</h4><ul class="footer-links"><li><a href="compress-jpg.html">Compress JPG</a></li><li><a href="compress-png.html">Compress PNG</a></li><li><a href="compress-svg.html">Compress SVG</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© 2025 PDFSnip.com</span><span>Made with ❤️</span></div>
 </footer>
+
 <div id="toast"></div>
 
 <script>
-let files=[], results=[];
+// ── State ─────────────────────────────────────────────────────────
+let files = [], results = [];
 
-document.getElementById('browseBtn').addEventListener('click',()=>document.getElementById('fileIn').click());
-document.getElementById('fileIn').addEventListener('change',e=>{addFiles([...e.target.files]);e.target.value='';});
-const dz=document.getElementById('dz');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');addFiles([...e.dataTransfer.files]);});
+// ── File input ────────────────────────────────────────────────────
+document.getElementById('browseBtn').addEventListener('click', () => document.getElementById('fileIn').click());
+document.getElementById('fileIn').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value = ''; });
+
+const dz = document.getElementById('dz');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); addFiles([...e.dataTransfer.files]); });
 
 function addFiles(incoming) {
-  const svgs=incoming.filter(f=>f.type==='image/svg+xml'||f.name.toLowerCase().endsWith('.svg'));
-  if(!svgs.length){toast('⚠️','Please select SVG files only');return;}
-  files=[...files,...svgs]; renderList();
+  const svgs = incoming.filter(f => f.type === 'image/svg+xml' || f.name.toLowerCase().endsWith('.svg'));
+  if (!svgs.length) { toast('⚠️', 'Please select SVG files only'); return; }
+  files = [...files, ...svgs];
+  renderList();
 }
-function renderList(){
-  const list=document.getElementById('fileList'); list.innerHTML='';
-  files.forEach((f,i)=>{
-    const d=document.createElement('div'); d.className='file-row';
-    d.innerHTML=`<span>✨</span><span class="file-row-name">${f.name}</span><span class="file-row-size">${fmt(f.size)}</span><button class="file-row-rm" onclick="removeFile(${i})">✕</button>`;
+
+function renderList() {
+  const list = document.getElementById('fileList'); list.innerHTML = '';
+  files.forEach((f, i) => {
+    const d = document.createElement('div'); d.className = 'file-row';
+    d.innerHTML = `<span>✨</span><span class="file-row-name">${f.name}</span><span class="file-row-size">${fmt(f.size)}</span><button class="file-row-rm" onclick="removeFile(${i})">✕</button>`;
     list.appendChild(d);
   });
-  document.getElementById('convertBtn').disabled=files.length===0;
+  document.getElementById('convertBtn').disabled = files.length === 0;
 }
-function removeFile(i){files.splice(i,1);renderList();}
-function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
 
+function removeFile(i) { files.splice(i, 1); renderList(); }
+function fmt(b) { if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
+
+// ── Build SVGO config from checkboxes ─────────────────────────────
+function buildSvgoConfig() {
+  const fp = parseInt(document.getElementById('floatPrecision').value);
+  const tp = parseInt(document.getElementById('transformPrecision').value);
+
+  const plugins = [];
+
+  // Always-useful cleanup passes
+  plugins.push({ name: 'preset-default', params: {
+    overrides: {
+      removeComments:         { enabled: document.getElementById('opt_removeComments').checked },
+      removeMetadata:         { enabled: document.getElementById('opt_removeMetadata').checked },
+      removeDoctype:          { enabled: document.getElementById('opt_removeDoctype').checked },
+      removeXMLProcInst:      { enabled: document.getElementById('opt_removeXMLProcInst').checked },
+      removeEditorsNSData:    { enabled: document.getElementById('opt_removeEditorsNSData').checked },
+      removeEmptyAttrs:       { enabled: document.getElementById('opt_removeEmptyAttrs').checked },
+      removeEmptyContainers:  { enabled: document.getElementById('opt_removeEmptyContainers').checked },
+      removeUnusedNS:         { enabled: document.getElementById('opt_removeUnusedNS').checked },
+      removeHiddenElems:      { enabled: document.getElementById('opt_removeHiddenElems').checked },
+      collapseGroups:         { enabled: document.getElementById('opt_collapseGroups').checked },
+      mergePaths:             { enabled: document.getElementById('opt_mergePaths').checked },
+      convertColors:          { enabled: document.getElementById('opt_convertColors').checked },
+      cleanupIds:             { enabled: document.getElementById('opt_cleanupIds').checked },
+      minifyStyles:           { enabled: document.getElementById('opt_minifyStyles').checked },
+      sortAttrs:              { enabled: document.getElementById('opt_sortAttrs').checked },
+      // set precision globally
+      cleanupNumericValues:   { floatPrecision: fp },
+      convertPathData:        { floatPrecision: fp },
+      convertTransform:       { floatPrecision: tp },
+    }
+  }});
+
+  return { plugins, js2svg: { pretty: false } };
+}
+
+// ── Core minification ─────────────────────────────────────────────
 async function runMinify() {
-  if(!files.length)return;
-  const btn=document.getElementById('convertBtn');
-  btn.disabled=true; btn.textContent='⚙️ Minifying…';
-  document.getElementById('logBox').innerHTML='';
-  document.getElementById('resultsWrap').style.display='none';
-  document.getElementById('resultCards').innerHTML='';
-  results=[];
+  if (!files.length) return;
 
-  const removeWhitespace=document.getElementById('removeWhitespace').checked;
-  const removeComments=document.getElementById('removeComments').checked;
-  const removeMetadata=document.getElementById('removeMetadata').checked;
-  const removeEditor=document.getElementById('removeEditor').checked;
+  // Check SVGO loaded
+  if (typeof svgo === 'undefined' && typeof window.svgo === 'undefined') {
+    toast('❌', 'SVGO library not loaded yet — please wait a moment and try again');
+    return;
+  }
+  const svgoLib = typeof svgo !== 'undefined' ? svgo : window.svgo;
 
-  for(const file of files) {
-    const row=addLogRow(`Minifying ${file.name}…`);
+  const btn = document.getElementById('convertBtn');
+  btn.disabled = true; btn.textContent = '⚙️ Minifying…';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('resultCards').innerHTML = '';
+  results.forEach(r => URL.revokeObjectURL(r.url)); results = [];
+
+  const config = buildSvgoConfig();
+
+  for (const file of files) {
+    const row = addLogRow(`Optimizing ${file.name}…`);
     try {
-      const text=await file.text();
-      const minified=minifySVG(text,{removeWhitespace,removeComments,removeMetadata,removeEditor});
-      const blob=new Blob([minified],{type:'image/svg+xml'});
-      const name=file.name.replace(/\.svg$/i,'')+'_minified.svg';
-      const url=URL.createObjectURL(blob);
-      results.push({name,blob,url,origSize:file.size,newSize:blob.size,svgText:minified});
-      const saving=Math.round((1-blob.size/file.size)*100);
-      addCard(file.name,name,url,results.length-1,file.size,blob.size,saving,minified);
-      markRowDone(row,`<strong>${file.name}</strong> — ${fmt(file.size)} → ${fmt(blob.size)} <span style="color:#44dd88">(${saving>0?saving+'% smaller':'no change'})</span>`);
-    } catch(e) {
-      markRowError(row,`Failed: ${file.name} — ${e.message}`);
+      const text = await file.text();
+      setRowText(row, `Running SVGO on <strong>${file.name}</strong>…`);
+
+      // Run SVGO
+      const result = svgoLib.optimize(text, { ...config, path: file.name });
+
+      if (result.error) throw new Error(result.error);
+
+      const minified = result.data;
+      const blob = new Blob([minified], { type: 'image/svg+xml' });
+      const url  = URL.createObjectURL(blob);
+      const name = file.name.replace(/\.svg$/i, '') + '.min.svg';
+
+      results.push({ name, blob, url, origSize: file.size, newSize: blob.size, svgText: minified });
+
+      const saving = Math.round((1 - blob.size / file.size) * 100);
+      addResultCard(file.name, name, url, results.length - 1, file.size, blob.size, saving, minified);
+      markRowDone(row, `<strong>${file.name}</strong> — ${fmt(file.size)} → ${fmt(blob.size)} <span style="color:#44dd88;font-weight:700">(${saving > 0 ? saving + '% smaller' : 'already optimal'})</span>`);
+
+    } catch (err) {
+      markRowError(row, `Failed: ${file.name} — ${err.message}`);
+      console.error(err);
     }
   }
 
-  document.getElementById('resultsWrap').style.display='block';
-  btn.textContent='✨ Minify SVGs'; btn.disabled=false;
-  toast('✅',`${results.length} SVG${results.length>1?'s':''} minified!`);
-  document.getElementById('resultsWrap').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('resultsWrap').style.display = 'block';
+  btn.textContent = '✨ Minify SVGs'; btn.disabled = false;
+  const avgSaving = results.length
+    ? Math.round((1 - results.reduce((s,r) => s + r.newSize, 0) / results.reduce((s,r) => s + r.origSize, 0)) * 100)
+    : 0;
+  toast('✅', `${results.length} SVG${results.length > 1 ? 's' : ''} optimized! Avg: ${avgSaving}% smaller`);
+  document.getElementById('resultsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function minifySVG(svgText, opts) {
-  let result = svgText;
+// ── Result card ───────────────────────────────────────────────────
+function addResultCard(origName, name, url, idx, origSize, newSize, saving, svgText) {
+  const cards = document.getElementById('resultCards');
+  const card  = document.createElement('div'); card.className = 'svg-card';
 
-  // Remove XML comments <!-- ... -->
-  if(opts.removeComments) {
-    result = result.replace(/<!--[\s\S]*?-->/g, '');
-  }
+  const barW  = Math.max(0, Math.min(100, saving));
+  const savingColor = saving >= 20 ? '#44dd88' : saving >= 5 ? '#ffcc44' : '#ff8866';
 
-  // Remove <metadata>...</metadata> blocks
-  if(opts.removeMetadata) {
-    result = result.replace(/<metadata[\s\S]*?<\/metadata>/gi, '');
-  }
-
-  // Remove Inkscape / Illustrator / Sodipodi namespaced attributes and elements
-  if(opts.removeEditor) {
-    result = result.replace(/<sodipodi:[^>]*\/>/gi, '');
-    result = result.replace(/<sodipodi:[\s\S]*?<\/sodipodi:[^>]*>/gi, '');
-    result = result.replace(/<inkscape:[^>]*\/>/gi, '');
-    result = result.replace(/\s+inkscape:[a-z-]+="[^"]*"/gi, '');
-    result = result.replace(/\s+sodipodi:[a-z-]+="[^"]*"/gi, '');
-    result = result.replace(/xmlns:inkscape="[^"]*"/gi, '');
-    result = result.replace(/xmlns:sodipodi="[^"]*"/gi, '');
-    result = result.replace(/xmlns:dc="[^"]*"/gi, '');
-    result = result.replace(/xmlns:cc="[^"]*"/gi, '');
-    result = result.replace(/xmlns:rdf="[^"]*"/gi, '');
-    // Remove Illustrator XML processing instructions
-    result = result.replace(/<\?[^>]*\?>/g, '');
-  }
-
-  // Remove whitespace between tags and collapse internal whitespace
-  if(opts.removeWhitespace) {
-    // Remove newlines and tabs
-    result = result.replace(/[\r\n\t]+/g, ' ');
-    // Collapse multiple spaces
-    result = result.replace(/  +/g, ' ');
-    // Remove spaces between tags
-    result = result.replace(/> </g, '><');
-    // Remove leading/trailing spaces in attribute values (careful)
-    result = result.replace(/\s+\/>/g, '/>');
-    result = result.trim();
-  }
-
-  return result;
-}
-
-function addCard(origName, name, url, idx, origSize, newSize, saving, svgText) {
-  const cards=document.getElementById('resultCards');
-  const card=document.createElement('div'); card.className='svg-card';
-
-  // SVG preview
-  const preview=document.createElement('div'); preview.className='svg-preview';
+  // SVG thumbnail
+  const previewBox = document.createElement('div'); previewBox.className = 'svg-preview-box';
   try {
-    const blob=new Blob([svgText],{type:'image/svg+xml'});
-    const purl=URL.createObjectURL(blob);
-    const img=document.createElement('img');
-    img.src=purl; img.style.maxWidth='100%'; img.style.maxHeight='100%';
-    preview.appendChild(img);
-  } catch(e){ preview.textContent='SVG'; }
+    const previewBlob = new Blob([svgText], { type: 'image/svg+xml' });
+    const previewUrl  = URL.createObjectURL(previewBlob);
+    const img = document.createElement('img'); img.src = previewUrl; img.alt = name;
+    // revoke preview URL after load
+    img.onload = () => setTimeout(() => URL.revokeObjectURL(previewUrl), 5000);
+    previewBox.appendChild(img);
+  } catch(e) { previewBox.textContent = 'SVG'; }
 
-  const info=document.createElement('div'); info.className='svg-info';
-  info.innerHTML=`
+  const info = document.createElement('div'); info.className = 'svg-info';
+  info.innerHTML = `
     <div class="svg-name">${name}</div>
-    <div class="svg-stats">
-      <span class="svg-sizes">${fmt(origSize)} → ${fmt(newSize)}</span>
-      <span class="svg-saving">${saving>0?'-'+saving+'%':'no change'}</span>
-    </div>`;
+    <div class="svg-meta">${fmt(origSize)} → ${fmt(newSize)}</div>
+    <div class="svg-saving" style="color:${savingColor}">${saving > 0 ? '-' + saving + '%' : 'already optimized'}</div>`;
 
-  const actions=document.createElement('div'); actions.className='svg-actions';
+  const top = document.createElement('div'); top.className = 'svg-card-top';
+  top.appendChild(previewBox); top.appendChild(info);
 
-  const dlBtn=document.createElement('button'); dlBtn.className='dl-btn'; dlBtn.textContent='↓ Download SVG';
-  dlBtn.addEventListener('click',()=>{
-    triggerDownload(results[idx].url,results[idx].name);
-    dlBtn.textContent='✓ Saved'; dlBtn.classList.add('done');
-    setTimeout(()=>{dlBtn.textContent='↓ Download SVG';dlBtn.classList.remove('done');},2500);
+  const barOuter = document.createElement('div'); barOuter.className = 'svg-bar-outer';
+  const barInner = document.createElement('div'); barInner.className = 'svg-bar-inner';
+  barInner.style.width = barW + '%';
+  barOuter.appendChild(barInner);
+
+  // action buttons
+  const actions = document.createElement('div'); actions.className = 'svg-actions';
+
+  const dlBtn = document.createElement('button'); dlBtn.className = 'dl-btn'; dlBtn.textContent = '↓ Download .min.svg';
+  dlBtn.addEventListener('click', () => {
+    triggerDownload(results[idx].url, results[idx].name);
+    dlBtn.textContent = '✓ Saved'; dlBtn.classList.add('done');
+    setTimeout(() => { dlBtn.textContent = '↓ Download .min.svg'; dlBtn.classList.remove('done'); }, 2500);
   });
 
-  const codeBtn=document.createElement('button'); codeBtn.className='preview-btn'; codeBtn.textContent='</> View Code';
-  const codeBlock=document.createElement('div'); codeBlock.className='code-block'; codeBlock.textContent=svgText.substring(0,500)+(svgText.length>500?'…':'');
-  codeBtn.addEventListener('click',()=>{
-    const showing=codeBlock.style.display==='block';
-    codeBlock.style.display=showing?'none':'block';
-    codeBtn.textContent=showing?'</> View Code':'✕ Hide Code';
+  const codeBlock = document.createElement('pre'); codeBlock.className = 'code-block';
+  codeBlock.textContent = svgText.length > 1000 ? svgText.substring(0, 1000) + '\n…(' + svgText.length + ' chars total)' : svgText;
+
+  const codeBtn = document.createElement('button'); codeBtn.className = 'code-toggle-btn'; codeBtn.textContent = '</> View Code';
+  codeBtn.addEventListener('click', () => {
+    const showing = codeBlock.style.display === 'block';
+    codeBlock.style.display = showing ? 'none' : 'block';
+    codeBtn.textContent = showing ? '</> View Code' : '✕ Hide Code';
   });
 
-  actions.appendChild(dlBtn); actions.appendChild(codeBtn);
-  info.appendChild(actions); info.appendChild(codeBlock);
-  card.appendChild(preview); card.appendChild(info);
+  const copyBtn = document.createElement('button'); copyBtn.className = 'code-toggle-btn'; copyBtn.textContent = '📋 Copy Code';
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(svgText);
+      copyBtn.textContent = '✓ Copied!';
+      setTimeout(() => { copyBtn.textContent = '📋 Copy Code'; }, 2000);
+      toast('✅', 'SVG code copied to clipboard!');
+    } catch (e) { toast('❌', 'Copy failed'); }
+  });
+
+  actions.appendChild(dlBtn); actions.appendChild(codeBtn); actions.appendChild(copyBtn);
+
+  card.appendChild(top); card.appendChild(barOuter); card.appendChild(actions); card.appendChild(codeBlock);
   cards.appendChild(card);
 }
 
-function triggerDownload(url,filename){
-  const a=document.createElement('a'); a.href=url; a.download=filename; a.style.display='none';
-  document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
+// ── Download / ZIP ────────────────────────────────────────────────
+function triggerDownload(url, filename) {
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.style.display = 'none';
+  document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200);
 }
 
-async function doZip(){
-  if(!results.length)return;
-  const btn=document.getElementById('zipBtn'); btn.disabled=true; btn.textContent='⏳ Building ZIP…';
+async function doZip() {
+  if (!results.length) return;
+  const btn = document.getElementById('zipBtn'); btn.disabled = true; btn.textContent = '⏳ Building ZIP…';
   try {
-    const zip=new JSZip();
-    results.forEach(({name,blob})=>zip.file(name,blob));
-    const zipBlob=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
-    triggerDownload(URL.createObjectURL(zipBlob),'PDFSnip_minified_svg.zip');
-    toast('📦','ZIP downloaded!');
-  } catch(e){toast('❌','ZIP error: '+e.message);}
-  btn.disabled=false; btn.textContent='📦 Download All as ZIP';
+    const zip = new JSZip();
+    results.forEach(({ name, blob }) => zip.file(name, blob));
+    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 9 } });
+    triggerDownload(URL.createObjectURL(zipBlob), 'PDFSnip_minified_svgs.zip');
+    toast('📦', 'ZIP downloaded!');
+  } catch (e) { toast('❌', 'ZIP error: ' + e.message); }
+  btn.disabled = false; btn.textContent = '📦 Download All as ZIP';
 }
 
-function doReset(){
-  results.forEach(r=>URL.revokeObjectURL(r.url)); results=[]; files=[];
-  document.getElementById('fileList').innerHTML='';
-  document.getElementById('logBox').innerHTML='';
-  document.getElementById('resultsWrap').style.display='none';
-  document.getElementById('resultCards').innerHTML='';
-  document.getElementById('convertBtn').disabled=true;
-  window.scrollTo({top:0,behavior:'smooth'});
+// ── Reset ─────────────────────────────────────────────────────────
+function doReset() {
+  results.forEach(r => URL.revokeObjectURL(r.url)); results = []; files = [];
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('resultCards').innerHTML = '';
+  document.getElementById('convertBtn').disabled = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function addLogRow(text){const box=document.getElementById('logBox');const row=document.createElement('div');row.className='log-row';row.innerHTML=`<div class="spinner"></div><span>${text}</span>`;box.appendChild(row);return row;}
-function setRowText(row,html){row.querySelector('span').innerHTML=html;}
-function markRowDone(row,html){row.querySelector('.spinner').outerHTML='<span>✅</span>';setRowText(row,html);}
-function markRowError(row,html){row.querySelector('.spinner').outerHTML='<span>❌</span>';setRowText(row,`<span style="color:#ff8866">${html}</span>`);}
-function toast(icon,msg){const t=document.getElementById('toast');t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
-document.querySelectorAll('.faq-q').forEach(q=>{q.addEventListener('click',()=>{const item=q.closest('.faq-item');const open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(el=>el.classList.remove('open'));if(!open)item.classList.add('open');});});
+// ── Log helpers ───────────────────────────────────────────────────
+function addLogRow(text) {
+  const box = document.getElementById('logBox');
+  const row = document.createElement('div'); row.className = 'log-row';
+  row.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
+  box.appendChild(row); return row;
+}
+function setRowText(row, html) { row.querySelector('span').innerHTML = html; }
+function markRowDone(row, html) { row.querySelector('.spinner').outerHTML = '<span>✅</span>'; setRowText(row, html); }
+function markRowError(row, html) { row.querySelector('.spinner').outerHTML = '<span>❌</span>'; setRowText(row, `<span style="color:#ff8866">${html}</span>`); }
+
+// ── Toast ─────────────────────────────────────────────────────────
+function toast(icon, msg) {
+  const t = document.getElementById('toast'); t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3800);
+}
+
+// ── FAQ ───────────────────────────────────────────────────────────
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.faq-item'); const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+});
 </script>
 </body>
 </html>
