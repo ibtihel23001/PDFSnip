@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compress JPG — Reduce JPEG Size Free | PDFSnip.com</title>
+  <meta name="description" content="Compress JPG images online for free. Reduce file size without visible quality loss. No watermark, instant download." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">PDF<span>Snip</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html#tools">All Tools</a></li>
+    <li><a href="index.html#how">How It Works</a></li>
+    <li><a href="index.html#faq">FAQ</a></li>
+    <li><a href="index.html" class="nav-cta">All Tools →</a></li>
+  </ul>
+</nav>
+
+<div class="converter-page">
+  <div class="page-breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <span>Compress JPG</span>
+  </div>
+
+  <div class="page-hero">
+    <h1>🖼️ Compress JPG</h1>
+    <p>Reduce your JPEG image file sizes by up to 80% while keeping them looking great. Perfect for web, email, and social media.</p>
+  </div>
+
+  <div class="drop-zone" id="dropZone">
+    <span class="drop-icon">🖼️</span>
+    <div class="drop-title">Drop your file here</div>
+    <div class="drop-sub">or click to browse · JPG/JPEG files up to 50MB</div>
+    <button class="btn-primary" onclick="document.querySelector('.drop-input').click()">
+      📂 Choose File
+    </button>
+    <input type="file" class="drop-input" accept=".jpg,.jpeg,image/jpeg" multiple />
+    <div class="file-list"></div>
+  </div>
+
+  <div class="tool-options">
+    <div class="options-title">⚙️ Settings</div>
+    <div class="options-row">
+      <div class="option-group">
+        <label class="option-label">Quality</label>
+        <select class="option-select" id="quality">
+          <option value="auto">Auto (Smart Compress)</option>
+          <option value="high">High — 85%</option>
+          <option value="medium">Medium — 70%</option>
+          <option value="low">Low — 50%</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label class="option-label">Custom Quality: <span id="customVal">80</span>%</label>
+        <input type="range" min="10" max="100" value="80" id="custom"
+          oninput="document.getElementById('customVal').textContent = this.value" />
+      </div>
+
+    </div>
+  </div>
+
+  <div class="convert-btn-wrap">
+    <button class="btn-convert" onclick="startConvert()" disabled style="background:var(--card-accent,var(--accent))">
+      🗜️ Compress JPG
+    </button>
+    <div class="progress-bar-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.8rem;color:var(--text2)">
+        <span>Processing...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="background:var(--card-accent,var(--accent))"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-section" id="results">
+    <div class="results-header">
+      <div class="results-title">✅ Your File Is Ready</div>
+      <button class="btn-primary" onclick="downloadAll()" style="font-size:0.88rem;padding:10px 20px;">
+        📦 Download All
+      </button>
+    </div>
+    <div class="results-grid">
+      <div class="result-card">
+        <div style="padding:28px;text-align:center">
+          <div style="font-size:3rem;margin-bottom:12px">🖼️</div>
+          <div style="font-size:0.9rem;font-weight:600;margin-bottom:6px">output_file.jpg</div>
+          <div style="font-size:0.78rem;color:var(--text2)">Ready to download</div>
+        </div>
+        <div class="result-card-bottom">
+          <span class="result-name">Processed successfully</span>
+          <button class="btn-dl" onclick="showToast('✅','Download started!')">↓ Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="section-header">
+      <div class="section-tag">FAQ</div>
+      <h2 class="section-title">Compress JPG — Common Questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">How does JPG compression work? <span class="faq-icon">+</span></div>
+        <div class="faq-a">JPG uses lossy compression — it selectively discards image data that is less visible to the human eye. Our tool balances file size reduction with visual quality to give you the best possible result.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will there be quality loss? <span class="faq-icon">+</span></div>
+        <div class="faq-a">All JPG compression involves some quality trade-off. At 80–90% quality settings, the difference is virtually invisible. Our Auto mode intelligently chooses the right level for each image.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I compress multiple JPGs at once? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes! Upload multiple JPG files in one go and compress them all simultaneously. Download each individually or as a single ZIP archive.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Does it work with JPEG files too? <span class="faq-icon">+</span></div>
+        <div class="faq-a">JPG and JPEG are the same format — just different file extensions. Our compressor accepts both .jpg and .jpeg files.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section style="padding:60px 40px;background:var(--bg2);border-top:1px solid var(--border)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="section-tag">Related Tools</div>
+    <h2 class="section-title" style="margin:12px 0 32px">You Might Also Need</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <a href="compress-png.html" class="btn-secondary" style="text-decoration:none">Compress PNG →</a>
+      <a href="jpg-to-png.html" class="btn-secondary" style="text-decoration:none">JPG to PNG →</a>
+      <a href="resize-image.html" class="btn-secondary" style="text-decoration:none">Resize Image →</a>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo">PDF<span style="color:var(--accent)">Snip</span></div>
+      <p>Free, fast, and private PDF and image tools for everyone. No watermarks, no limits.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">PDF Tools</div>
+      <ul class="footer-links">
+        <li><a href="pdf-to-jpg.html">PDF to JPG</a></li>
+        <li><a href="compress-pdf.html">Compress PDF</a></li>
+        <li><a href="merge-pdf.html">Merge PDF</a></li>
+        <li><a href="split-pdf.html">Split PDF</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Image Tools</div>
+      <ul class="footer-links">
+        <li><a href="compress-jpg.html">Compress JPG</a></li>
+        <li><a href="compress-png.html">Compress PNG</a></li>
+        <li><a href="compress-svg.html">Compress SVG</a></li>
+        <li><a href="jpg-to-png.html">JPG to PNG</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PDFSnip.com — All rights reserved.</span>
+    <span>Made with ❤️ for the web</span>
+  </div>
+</footer>
+
+<style>:root { --card-accent: #ff5533; }</style>
+<script src="js/main.js"></script>
+<script>
+window.startConvert = function() {
+  const btn = document.querySelector('.btn-convert');
+  const progress = document.querySelector('.progress-bar-wrap');
+  const fill = document.getElementById('progressFill');
+  const pct = document.getElementById('progressPct');
+  const results = document.querySelector('.results-section');
+  if (!selectedFiles.length) return;
+  btn.disabled = true;
+  btn.innerHTML = '⚙️ Processing...';
+  progress.classList.add('show');
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 16;
+    if (p >= 100) {
+      p = 100; clearInterval(iv);
+      fill.style.width = '100%'; pct.textContent = '100%';
+      setTimeout(() => {
+        btn.innerHTML = '🔄 Process More';
+        btn.disabled = false;
+        results.classList.add('show');
+        showToast('✅', 'Done! Your file is ready to download.');
+      }, 400);
+    }
+    fill.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+  }, 150);
+};
+</script>
+</body>
+</html>

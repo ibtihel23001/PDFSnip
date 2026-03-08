@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF to JPG Converter — Free, Fast | PDFSnip.com</title>
+  <meta name="description" content="Convert PDF files to high-quality JPG images instantly. Free, secure, no watermark — powered by PDFSnip.com." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">PDF<span>Snip</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html#tools">All Tools</a></li>
+    <li><a href="index.html#how">How It Works</a></li>
+    <li><a href="index.html#faq">FAQ</a></li>
+    <li><a href="index.html" class="nav-cta">All Tools →</a></li>
+  </ul>
+</nav>
+
+<!-- CONVERTER PAGE -->
+<div class="converter-page">
+
+  <div class="page-breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <span>PDF to JPG</span>
+  </div>
+
+  <div class="page-hero">
+    <h1>PDF to JPG Converter</h1>
+    <p>Convert every PDF page into a sharp, high-quality JPG image. Fast, free, and private — no watermarks ever.</p>
+  </div>
+
+  <!-- DROP ZONE -->
+  <div class="drop-zone" id="dropZone">
+    <span class="drop-icon">📄</span>
+    <div class="drop-title">Drop your PDF here</div>
+    <div class="drop-sub">or click to browse · Supports PDF files up to 100MB</div>
+    <button class="btn-primary" onclick="document.querySelector('.drop-input').click()">
+      📂 Choose PDF File
+    </button>
+    <input type="file" class="drop-input" accept=".pdf,application/pdf" multiple />
+    <div class="file-list"></div>
+  </div>
+
+  <!-- OPTIONS -->
+  <div class="tool-options">
+    <div class="options-title">⚙️ Conversion Settings</div>
+    <div class="options-row">
+      <div class="option-group">
+        <label class="option-label">Output Quality</label>
+        <select class="option-select" id="quality">
+          <option value="high">High (300 DPI)</option>
+          <option value="medium" selected>Medium (150 DPI)</option>
+          <option value="low">Low (72 DPI)</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label class="option-label">Color Mode</label>
+        <select class="option-select" id="color">
+          <option value="color" selected>Full Color (RGB)</option>
+          <option value="gray">Grayscale</option>
+          <option value="bw">Black & White</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label class="option-label">Pages to Convert</label>
+        <select class="option-select" id="pages">
+          <option value="all" selected>All Pages</option>
+          <option value="first">First Page Only</option>
+          <option value="custom">Custom Range</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label class="option-label">JPG Quality: <span id="jpgQualityVal">90</span>%</label>
+        <input type="range" min="60" max="100" value="90" id="jpgQuality"
+          oninput="document.getElementById('jpgQualityVal').textContent = this.value" />
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERT BUTTON -->
+  <div class="convert-btn-wrap">
+    <button class="btn-convert" onclick="startConvert()" disabled>
+      🚀 Convert to JPG
+    </button>
+    <div class="progress-bar-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.8rem;color:var(--text2)">
+        <span>Converting...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-section" id="results">
+    <div class="results-header">
+      <div class="results-title">✅ Your Images Are Ready</div>
+      <button class="btn-primary" onclick="downloadAll()" style="font-size:0.88rem;padding:10px 20px;">
+        📦 Download All as ZIP
+      </button>
+    </div>
+    <div class="results-grid"></div>
+  </div>
+
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div class="section-header">
+      <div class="section-tag">How It Works</div>
+      <h2 class="section-title">Convert in 3 Steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <span class="step-icon">📄</span>
+        <div class="step-title">Upload Your PDF</div>
+        <div class="step-desc">Drag & drop your PDF file or click the button to browse. Multiple files are supported — batch convert with ease.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <span class="step-icon">🎛️</span>
+        <div class="step-title">Pick Your Settings</div>
+        <div class="step-desc">Choose output DPI (72–300), color mode, and JPG quality. The defaults are optimized for most use cases.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <span class="step-icon">⬇️</span>
+        <div class="step-title">Download JPG Images</div>
+        <div class="step-desc">Download individual images or grab all pages as a ZIP file. Files are ready in seconds and deleted after 1 hour.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits-section">
+  <div class="section-header">
+    <div class="section-tag">Why Use PDFSnip</div>
+    <h2 class="section-title">The Best PDF to JPG Tool</h2>
+  </div>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <span class="benefit-icon">🖼️</span>
+      <div class="benefit-title">Crystal Clear Images</div>
+      <div class="benefit-desc">Up to 300 DPI output means your JPG images are sharp enough for print, presentations, and anything in between.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">📦</span>
+      <div class="benefit-title">Batch Conversion</div>
+      <div class="benefit-desc">Upload multiple PDFs at once. All pages from all files are converted and bundled into a convenient ZIP download.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">🔒</span>
+      <div class="benefit-title">100% Private</div>
+      <div class="benefit-desc">Your PDF files are processed securely and never stored. Everything is deleted automatically after one hour.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">🚫</span>
+      <div class="benefit-title">No Watermarks</div>
+      <div class="benefit-desc">Unlike many "free" tools, PDFSnip never stamps your images with watermarks. Your output is clean and professional.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">📱</span>
+      <div class="benefit-title">Works on Any Device</div>
+      <div class="benefit-desc">Full mobile support — convert PDFs to JPG on your phone, tablet, or desktop without installing anything.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">⚡</span>
+      <div class="benefit-title">Instant Results</div>
+      <div class="benefit-desc">Our servers are tuned for speed. Most PDFs convert in 2–5 seconds regardless of the number of pages.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="section-header">
+      <div class="section-tag">FAQ</div>
+      <h2 class="section-title">PDF to JPG Questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">What resolution should I choose for PDF to JPG conversion? <span class="faq-icon">+</span></div>
+        <div class="faq-a">For screen viewing and email, 72–96 DPI is sufficient. For presentations, 150 DPI works well. For printing or archiving, use 300 DPI for the sharpest results. Our default of 150 DPI is a good balance of quality and file size.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I convert a multi-page PDF to JPG? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes! Each page in your PDF becomes a separate JPG image. You can download them individually or as a ZIP archive containing all pages in order.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will the image quality be good enough for printing? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Absolutely. Select "High (300 DPI)" in the settings and set JPG quality to 95–100% for print-ready output. This produces professional-grade images suitable for physical printing.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is there a limit on how many pages can be converted? <span class="faq-icon">+</span></div>
+        <div class="faq-a">There is no page limit. You can convert PDFs with hundreds of pages. Conversion time scales linearly — a 100-page document typically converts in under 30 seconds.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why would I convert PDF to JPG instead of PNG? <span class="faq-icon">+</span></div>
+        <div class="faq-a">JPG files are smaller and more compatible for web use, social media, and email. PNG is better when you need transparency or lossless quality. We also offer a PDF to PNG tool if that's what you need.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Does converting PDF to JPG remove my personal data? <span class="faq-icon">+</span></div>
+        <div class="faq-a">The conversion process renders your PDF visually into an image — any embedded text, metadata, or form data in the PDF will not be present in the JPG output. The image only contains the visual content of the page.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OTHER TOOLS CTA -->
+<section style="padding:80px 40px;text-align:center;background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="section-tag">More Tools</div>
+  <h2 class="section-title" style="margin:12px auto 16px">Need Something Else?</h2>
+  <p style="color:var(--text2);margin-bottom:36px">We have 40+ free tools for all your PDF and image needs.</p>
+  <a href="index.html#tools" class="btn-primary">See All Tools →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo">PDF<span style="color:var(--accent)">Snip</span></div>
+      <p>Free, fast, and private PDF and image tools for everyone. No watermarks, no limits, no nonsense.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">PDF Tools</div>
+      <ul class="footer-links">
+        <li><a href="pdf-to-jpg.html">PDF to JPG</a></li>
+        <li><a href="compress-pdf.html">Compress PDF</a></li>
+        <li><a href="merge-pdf.html">Merge PDF</a></li>
+        <li><a href="split-pdf.html">Split PDF</a></li>
+        <li><a href="pdf-to-png.html">PDF to PNG</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Image Tools</div>
+      <ul class="footer-links">
+        <li><a href="compress-jpg.html">Compress JPG</a></li>
+        <li><a href="compress-png.html">Compress PNG</a></li>
+        <li><a href="compress-svg.html">Compress SVG</a></li>
+        <li><a href="jpg-to-png.html">JPG to PNG</a></li>
+        <li><a href="resize-image.html">Resize Image</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PDFSnip.com — All rights reserved.</span>
+    <span>Made with ❤️ for the web</span>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+// Override progress to update percentage text
+const origStart = startConvert;
+window.startConvert = function() {
+  const pct = document.getElementById('progressPct');
+  const fill = document.getElementById('progressFill');
+  const btn = document.querySelector('.btn-convert');
+  const progress = document.querySelector('.progress-bar-wrap');
+  const results = document.querySelector('.results-section');
+
+  if (!selectedFiles.length) return;
+  btn.disabled = true;
+  btn.innerHTML = '⚙️ Converting...';
+  progress.classList.add('show');
+
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 14;
+    if (p >= 100) {
+      p = 100;
+      clearInterval(iv);
+      fill.style.width = '100%';
+      pct.textContent = '100%';
+      setTimeout(() => {
+        btn.innerHTML = '🔄 Convert More';
+        btn.disabled = false;
+        results.classList.add('show');
+        renderResults();
+        showToast('✅', 'Done! Download your images below.');
+      }, 400);
+    }
+    fill.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+  }, 160);
+};
+</script>
+</body>
+</html>

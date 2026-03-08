@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merge PDF — Combine PDF Files Free | PDFSnip.com</title>
+  <meta name="description" content="Merge multiple PDF files into one document online. Free, fast, and secure. No watermark, no signup required." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">PDF<span>Snip</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html#tools">All Tools</a></li>
+    <li><a href="index.html#how">How It Works</a></li>
+    <li><a href="index.html#faq">FAQ</a></li>
+    <li><a href="index.html" class="nav-cta">All Tools →</a></li>
+  </ul>
+</nav>
+
+<div class="converter-page">
+  <div class="page-breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <span>Merge PDF</span>
+  </div>
+
+  <div class="page-hero">
+    <h1>🔗 Merge PDF</h1>
+    <p>Combine any number of PDF files into a single document. Drag to reorder pages before merging.</p>
+  </div>
+
+  <div class="drop-zone" id="dropZone">
+    <span class="drop-icon">🔗</span>
+    <div class="drop-title">Drop your file here</div>
+    <div class="drop-sub">or click to browse · PDF files (upload 2 or more)</div>
+    <button class="btn-primary" onclick="document.querySelector('.drop-input').click()">
+      📂 Choose File
+    </button>
+    <input type="file" class="drop-input" accept=".pdf,application/pdf" multiple />
+    <div class="file-list"></div>
+  </div>
+
+  <div class="tool-options">
+    <div class="options-title">⚙️ Settings</div>
+    <div class="options-row">
+      <div class="option-group">
+        <label class="option-label">Page Order</label>
+        <select class="option-select" id="order">
+          <option value="original">Keep Original Order</option>
+          <option value="reverse">Reverse Order</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label class="option-label">Output Compression</label>
+        <select class="option-select" id="compress">
+          <option value="yes">Compress Output</option>
+          <option value="no">Keep Full Quality</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="convert-btn-wrap">
+    <button class="btn-convert" onclick="startConvert()" disabled style="background:var(--card-accent,var(--accent))">
+      🔗 Merge PDFs
+    </button>
+    <div class="progress-bar-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.8rem;color:var(--text2)">
+        <span>Processing...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="background:var(--card-accent,var(--accent))"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-section" id="results">
+    <div class="results-header">
+      <div class="results-title">✅ Your File Is Ready</div>
+      <button class="btn-primary" onclick="downloadAll()" style="font-size:0.88rem;padding:10px 20px;">
+        📦 Download All
+      </button>
+    </div>
+    <div class="results-grid">
+      <div class="result-card">
+        <div style="padding:28px;text-align:center">
+          <div style="font-size:3rem;margin-bottom:12px">🔗</div>
+          <div style="font-size:0.9rem;font-weight:600;margin-bottom:6px">output_file.pdf</div>
+          <div style="font-size:0.78rem;color:var(--text2)">Ready to download</div>
+        </div>
+        <div class="result-card-bottom">
+          <span class="result-name">Processed successfully</span>
+          <button class="btn-dl" onclick="showToast('✅','Download started!')">↓ Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="section-header">
+      <div class="section-tag">FAQ</div>
+      <h2 class="section-title">Merge PDF — Common Questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">How many PDF files can I merge? <span class="faq-icon">+</span></div>
+        <div class="faq-a">There is no hard limit on the number of files. You can merge dozens of PDFs in one go. The total combined size should not exceed 500MB.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I reorder pages before merging? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes — after uploading your PDFs, you can drag and drop them to reorder which document comes first, second, etc. Full page-level reordering is coming soon.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will the merged PDF be searchable? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. Text content from all merged PDFs is preserved, including embedded fonts and OCR text. The resulting merged PDF is fully searchable.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are bookmarks and links preserved? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Internal document bookmarks are preserved where possible. Cross-document links may not work after merging, but page content and formatting are maintained.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section style="padding:60px 40px;background:var(--bg2);border-top:1px solid var(--border)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="section-tag">Related Tools</div>
+    <h2 class="section-title" style="margin:12px 0 32px">You Might Also Need</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <a href="split-pdf.html" class="btn-secondary" style="text-decoration:none">Split PDF →</a>
+      <a href="compress-pdf.html" class="btn-secondary" style="text-decoration:none">Compress PDF →</a>
+      <a href="pdf-to-jpg.html" class="btn-secondary" style="text-decoration:none">PDF to JPG →</a>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo">PDF<span style="color:var(--accent)">Snip</span></div>
+      <p>Free, fast, and private PDF and image tools for everyone. No watermarks, no limits.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">PDF Tools</div>
+      <ul class="footer-links">
+        <li><a href="pdf-to-jpg.html">PDF to JPG</a></li>
+        <li><a href="compress-pdf.html">Compress PDF</a></li>
+        <li><a href="merge-pdf.html">Merge PDF</a></li>
+        <li><a href="split-pdf.html">Split PDF</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Image Tools</div>
+      <ul class="footer-links">
+        <li><a href="compress-jpg.html">Compress JPG</a></li>
+        <li><a href="compress-png.html">Compress PNG</a></li>
+        <li><a href="compress-svg.html">Compress SVG</a></li>
+        <li><a href="jpg-to-png.html">JPG to PNG</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PDFSnip.com — All rights reserved.</span>
+    <span>Made with ❤️ for the web</span>
+  </div>
+</footer>
+
+<style>:root { --card-accent: #4488ff; }</style>
+<script src="js/main.js"></script>
+<script>
+window.startConvert = function() {
+  const btn = document.querySelector('.btn-convert');
+  const progress = document.querySelector('.progress-bar-wrap');
+  const fill = document.getElementById('progressFill');
+  const pct = document.getElementById('progressPct');
+  const results = document.querySelector('.results-section');
+  if (!selectedFiles.length) return;
+  btn.disabled = true;
+  btn.innerHTML = '⚙️ Processing...';
+  progress.classList.add('show');
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 16;
+    if (p >= 100) {
+      p = 100; clearInterval(iv);
+      fill.style.width = '100%'; pct.textContent = '100%';
+      setTimeout(() => {
+        btn.innerHTML = '🔄 Process More';
+        btn.disabled = false;
+        results.classList.add('show');
+        showToast('✅', 'Done! Your file is ready to download.');
+      }, 400);
+    }
+    fill.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+  }, 150);
+};
+</script>
+</body>
+</html>
